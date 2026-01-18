@@ -1,7 +1,5 @@
-/**
- * Tree and Blob Service
- * GitHub tree and blob operations
- */
+// Tree and Blob Service
+// GitHub tree and blob operations
 
 import github from '../githubClient.js';
 

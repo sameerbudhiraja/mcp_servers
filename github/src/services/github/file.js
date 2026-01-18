@@ -1,7 +1,5 @@
-/**
- * File Service
- * GitHub file and directory operations
- */
+// File Service
+// GitHub file and directory operations
 
 import github from '../githubClient.js';
 

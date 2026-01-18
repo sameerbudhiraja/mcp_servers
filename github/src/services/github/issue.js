@@ -1,7 +1,5 @@
-/**
- * Issue Service
- * GitHub issue operations
- */
+// Issue Service
+// GitHub issue operations
 
 import github from '../githubClient.js';
 

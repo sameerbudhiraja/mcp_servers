@@ -95,10 +95,10 @@ export async function gitCheckout(repoPath, branch, createNew = false) {
   if (createNew) {
     await git.checkoutLocalBranch(branch);
     return `Created and switched to new branch '${branch}'`;
-  } else {
-    await git.checkout(branch);
-    return `Switched to branch '${branch}'`;
+
   }
+  await git.checkout(branch);
+  return `Switched to branch '${branch}'`;
 }
 
 // List local branches
@@ -141,10 +141,10 @@ export async function gitTag(repoPath, tagName, message = null) {
   if (message) {
     await git.addAnnotatedTag(tagName, message);
     return `Created annotated tag '${tagName}' with message: ${message}`;
-  } else {
+  } 
     await git.addTag(tagName);
     return `Created tag '${tagName}'`;
-  }
+  
 }
 
 // Fetch from remote

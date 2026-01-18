@@ -22,6 +22,7 @@ module.exports = {
     'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     'no-undef': 'error',
     'no-shadow': 'off',
+    'no-underscore-dangle': ['error', { allow: ['__dirname', '__filename'] }],
 
     // ---- Imports ----
     'import/extensions': [

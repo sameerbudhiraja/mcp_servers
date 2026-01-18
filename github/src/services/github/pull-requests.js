@@ -1,7 +1,5 @@
-/**
- * Pull Request Service
- * GitHub pull request operations
- */
+// Pull Request Service
+// GitHub pull request operations
 
 import github from '../githubClient.js';
 

@@ -1,7 +1,5 @@
-/**
- * GitHub Services Index
- * Central export point for all GitHub services
- */
+// GitHub Services Index
+// Central export point for all GitHub services
 
 export * from './repository.js';
 export * from './issue.js';

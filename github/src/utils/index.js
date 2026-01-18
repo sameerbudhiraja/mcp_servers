@@ -1,7 +1,5 @@
-/**
- * Utilities Index
- * Central export point for all utilities
- */
+// Utilities Index
+// Central export point for all utilities
 
 import * as errorHandler from './error-handler.js';
 import * as responseFormatter from './response-formatter.js';

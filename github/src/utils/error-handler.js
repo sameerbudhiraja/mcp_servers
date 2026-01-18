@@ -1,7 +1,5 @@
-/**
- * Error Handler Utility
- * Centralized error handling with proper logging and formatting
- */
+// Error Handler Utility
+// Centralized error handling with proper logging and formatting
 
 import { ERROR_MESSAGES } from '../constants/index.js';
 import logger from './logger.js';

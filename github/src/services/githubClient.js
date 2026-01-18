@@ -1,7 +1,5 @@
-/**
- * GitHub API Client
- * Configured axios instance for GitHub API requests
- */
+// GitHub API Client
+// Configured axios instance for GitHub API requests
 
 import axios from 'axios';
 import 'dotenv/config';
