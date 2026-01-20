@@ -1,7 +1,6 @@
-/**
- * Search Service
- * GitHub search operations
- */
+// Search Service
+// GitHub search operations
+
 
 import github from '../githubClient.js';
 

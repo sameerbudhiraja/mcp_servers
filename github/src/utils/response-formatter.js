@@ -1,7 +1,5 @@
-/**
- * Response Formatter Utility
- * Consistent response formatting for all tools
- */
+// Response Formatter Utility
+// Consistent response formatting for all tools
 
 /**
  * Helper function to handle circular references in JSON.stringify

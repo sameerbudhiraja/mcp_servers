@@ -1,7 +1,5 @@
-/**
- * GitHub MCP Server
- * Main entry point for the MCP server with GitHub API and Git CLI operations
- */
+// GitHub MCP Server
+// Main entry point for the MCP server with GitHub API and Git CLI operations
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';

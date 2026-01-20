@@ -1,7 +1,6 @@
-/**
- * Repository Service
- * GitHub repository operations
- */
+// Repository Service
+// GitHub repository operations
+
 
 import github from '../githubClient.js';
 

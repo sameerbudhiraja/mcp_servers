@@ -1,7 +1,5 @@
-/**
- * Commit Service
- * GitHub commit operations
- */
+// Commit Service
+// GitHub commit operations
 
 import github from '../githubClient.js';
 

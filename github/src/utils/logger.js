@@ -1,64 +1,165 @@
-/**
- * Logger Utility
- * Simple logging with levels
- */
+// Logger Utility
 
+import winston from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import config from '../config/index.js';
 
-const LOG_LEVELS = {
-  error: 0,
-  warn: 1,
-  info: 2,
-  debug: 3,
-};
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const currentLevel = LOG_LEVELS[config.logging.level] || LOG_LEVELS.error;
+// Define log directory
+const LOG_DIR = path.join(__dirname, '../../logs');
 
 /**
- * Log error message
- * @param {...any} args - Arguments to log
+ * Custom log format with timestamp, level, and message
  */
-function error(...args) {
-  if (config.logging.enabled && currentLevel >= LOG_LEVELS.error) {
-    console.error('[ERROR]', ...args);
+const logFormat = winston.format.combine(
+  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+  winston.format.errors({ stack: true }),
+  winston.format.splat(),
+  winston.format.printf(({ timestamp, level, message, stack, ...metadata }) => {
+    let msg = `${timestamp} [${level.toUpperCase()}]: ${message}`;
+    
+    // Add stack trace for errors
+    if (stack) {
+      msg += `\n${stack}`;
+    }
+    
+    // Add metadata if present
+    if (Object.keys(metadata).length > 0) {
+      msg += `\n${JSON.stringify(metadata, null, 2)}`;
+    }
+    
+    return msg;
+  })
+);
+
+/**
+ * Console format with colors
+ */
+const consoleFormat = winston.format.combine(
+  winston.format.colorize(),
+  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+  winston.format.printf(({ timestamp, level, message, stack }) => {
+    let msg = `${timestamp} ${level}: ${message}`;
+    if (stack) {
+      msg += `\n${stack}`;
+    }
+    return msg;
+  })
+);
+
+/**
+ * Create transports array based on configuration
+ */
+const transports = [];
+
+// Console transport (always enabled if logging is enabled)
+if (config.logging.enabled) {
+  transports.push(
+    new winston.transports.Console({
+      format: consoleFormat,
+      level: config.logging.level,
+    })
+  );
+}
+
+// File transports with daily rotation
+if (config.logging.fileEnabled) {
+  // Combined log - all levels
+  transports.push(
+    new DailyRotateFile({
+      filename: path.join(LOG_DIR, 'combined-%DATE%.log'),
+      datePattern: 'YYYY-MM-DD',
+      maxSize: config.logging.maxFileSize,
+      maxFiles: config.logging.maxFiles,
+      format: logFormat,
+      level: config.logging.level,
+    })
+  );
+
+  // Error log - only errors
+  transports.push(
+    new DailyRotateFile({
+      filename: path.join(LOG_DIR, 'error-%DATE%.log'),
+      datePattern: 'YYYY-MM-DD',
+      maxSize: config.logging.maxFileSize,
+      maxFiles: config.logging.maxFiles,
+      format: logFormat,
+      level: 'error',
+    })
+  );
+
+  // Info log - info and above
+  if (config.logging.level === 'info' || config.logging.level === 'debug') {
+    transports.push(
+      new DailyRotateFile({
+        filename: path.join(LOG_DIR, 'info-%DATE%.log'),
+        datePattern: 'YYYY-MM-DD',
+        maxSize: config.logging.maxFileSize,
+        maxFiles: config.logging.maxFiles,
+        format: logFormat,
+        level: 'info',
+      })
+    );
+  }
+
+  // Debug log - debug level only
+  if (config.logging.level === 'debug') {
+    transports.push(
+      new DailyRotateFile({
+        filename: path.join(LOG_DIR, 'debug-%DATE%.log'),
+        datePattern: 'YYYY-MM-DD',
+        maxSize: config.logging.maxFileSize,
+        maxFiles: config.logging.maxFiles,
+        format: logFormat,
+        level: 'debug',
+      })
+    );
   }
 }
 
 /**
- * Log warning message
- * @param {...any} args - Arguments to log
+ * Create Winston logger instance
  */
-function warn(...args) {
-  if (config.logging.enabled && currentLevel >= LOG_LEVELS.warn) {
-    console.warn('[WARN]', ...args);
-  }
-}
+const logger = winston.createLogger({
+  levels: winston.config.npm.levels,
+  transports,
+  exitOnError: false,
+  // Handle uncaught exceptions and rejections
+  exceptionHandlers: config.logging.fileEnabled
+    ? [
+        new DailyRotateFile({
+          filename: path.join(LOG_DIR, 'exceptions-%DATE%.log'),
+          datePattern: 'YYYY-MM-DD',
+          maxSize: config.logging.maxFileSize,
+          maxFiles: config.logging.maxFiles,
+          format: logFormat,
+        }),
+      ]
+    : [],
+  rejectionHandlers: config.logging.fileEnabled
+    ? [
+        new DailyRotateFile({
+          filename: path.join(LOG_DIR, 'rejections-%DATE%.log'),
+          datePattern: 'YYYY-MM-DD',
+          maxSize: config.logging.maxFileSize,
+          maxFiles: config.logging.maxFiles,
+          format: logFormat,
+        }),
+      ]
+    : [],
+});
 
 /**
- * Log info message
- * @param {...any} args - Arguments to log
+ * Log startup information
  */
-function info(...args) {
-  if (config.logging.enabled && currentLevel >= LOG_LEVELS.info) {
-    console.log('[INFO]', ...args);
-  }
-}
-
-/**
- * Log debug message
- * @param {...any} args - Arguments to log
- */
-function debug(...args) {
-  if (config.logging.enabled && currentLevel >= LOG_LEVELS.debug) {
-    console.log('[DEBUG]', ...args);
-  }
-}
-
-const logger = {
-  error,
-  warn,
-  info,
-  debug,
-};
+logger.info('Logger initialized', {
+  level: config.logging.level,
+  fileLogging: config.logging.fileEnabled,
+  logDirectory: LOG_DIR,
+});
 
 export default logger;

@@ -27,6 +27,9 @@ const config = {
   logging: {
     level: process.env.LOG_LEVEL || 'error',
     enabled: process.env.LOGGING_ENABLED !== 'false',
+    fileEnabled: process.env.LOG_FILE_ENABLED !== 'false', // Enable file logging by default
+    maxFileSize: process.env.LOG_MAX_FILE_SIZE || '20m', // Max size per log file
+    maxFiles: process.env.LOG_MAX_FILES || '14d', // Keep logs for 14 days
   },
 };
 

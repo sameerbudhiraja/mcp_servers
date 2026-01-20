@@ -1,7 +1,5 @@
-/**
- * Branch Service
- * GitHub branch operations
- */
+// Branch Service
+// GitHub branch operations
 
 import github from '../githubClient.js';
 
