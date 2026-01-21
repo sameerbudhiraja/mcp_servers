@@ -1,342 +1,921 @@
-# Git Tools Reference
+# GitHub MCP Server - Tools Reference
 
-This document provides an overview of all tools available in the MCP server, including both **Local Git CLI operations** and **GitHub API operations**.
+Complete technical reference for all 57 tools available in the GitHub MCP Server.
 
 ---
 
-## 💻 Local Git CLI Operations (20 functions)
+## Table of Contents
+- [HTTP Headers & Authentication](#http-headers--authentication)
+- [Git CLI Tools (20)](#-git-cli-tools-20)
+- [GitHub API Tools (37)](#-github-api-tools-37)
+- [Token Permissions Matrix](#-token-permissions-matrix)
 
-These tools execute local Git commands on your filesystem using the `simple-git` library.
+---
 
-### Repository Initialization & Status (2 functions)
+## HTTP Headers & Authentication
 
-| Function | Description | Parameters |
-|----------|-------------|------------|
-| `git_init(repoPath)` | Initialize a new Git repository | repoPath |
-| `git_status(repoPath)` | Get repository status | repoPath |
+### GitHub API Headers
 
-### Staging & Committing (2 functions)
+All GitHub API requests use the following headers configured in `src/services/github-client.js`:
 
-| Function | Description | Parameters |
-|----------|-------------|------------|
-| `git_add(repoPath, files)` | Stage files for commit | repoPath, files (string or array, use '.' for all) |
-| `git_commit(repoPath, message)` | Create a commit | repoPath, message |
+| Header | Value | Purpose |
+|--------|-------|---------|
+| `Authorization` | `Bearer ${GIT_TOKEN}` | Authentication via Personal Access Token |
+| `Accept` | `application/vnd.github+json` | Standard GitHub API JSON response format |
+| `X-GitHub-Api-Version` | `2022-11-28` | API version (configurable via `GIT_API_VERSION`) |
 
-### Remote Operations (6 functions)
+### Special Accept Headers
 
-| Function | Description | Parameters |
-|----------|-------------|------------|
-| `git_push(repoPath, remote, branch, setUpstream)` | Push commits to remote | repoPath, remote, branch, setUpstream (optional) |
-| `git_pull(repoPath, remote, branch)` | Pull changes from remote | repoPath, remote, branch |
-| `git_clone(url, targetPath)` | Clone a repository | url, targetPath |
-| `git_remote_add(repoPath, name, url)` | Add a remote repository | repoPath, name, url |
-| `git_remote_list(repoPath)` | List remote repositories | repoPath |
-| `git_remote_remove(repoPath, name)` | Remove a remote | repoPath, name |
+Some operations use specific Accept headers:
 
-### History & Inspection (2 functions)
+| Operation | Accept Header | Purpose |
+|-----------|---------------|---------|
+| Get Repository Topics | `application/vnd.github.mercy-preview+json` | Topics preview API |
+| Get Commit Diff | `application/vnd.github.v3.diff` | Raw diff format |
+| Get PR Diff | `application/vnd.github.v3.diff` | Raw diff format |
 
-| Function | Description | Parameters |
-|----------|-------------|------------|
-| `git_log(repoPath, maxCount)` | Get commit history | repoPath, maxCount (optional, default: 10) |
-| `git_diff(repoPath, options)` | Show changes (diff) | repoPath, options (optional) |
+### Request Configuration
 
-### Branch Operations (3 functions)
+| Setting | Default | Environment Variable |
+|---------|---------|---------------------|
+| Base URL | `https://api.github.com` | `GIT_BASE_URL` |
+| Timeout | 30000ms | `GIT_TIMEOUT` |
+| API Version | `2022-11-28` | `GIT_API_VERSION` |
 
-| Function | Description | Parameters |
-|----------|-------------|------------|
-| `git_checkout(repoPath, branch, createNew)` | Switch or create branches | repoPath, branch, createNew (optional) |
-| `git_branch_list(repoPath)` | List local branches | repoPath |
-| `git_branch_delete(repoPath, branch, force)` | Delete a branch | repoPath, branch, force (optional) |
+---
 
-### Advanced Operations (5 functions)
+## 💻 Git CLI Tools (20)
 
-| Function | Description | Parameters |
-|----------|-------------|------------|
-| `git_reset(repoPath, mode, commit)` | Reset to a commit | repoPath, mode (optional: 'soft', 'mixed', 'hard'), commit (optional, default: 'HEAD') |
-| `git_stash(repoPath, action)` | Stash changes | repoPath, action (optional: 'save', 'pop', 'list', 'clear') |
-| `git_tag(repoPath, tagName, message)` | Create a tag | repoPath, tagName, message (optional, for annotated tags) |
-| `git_fetch(repoPath, remote)` | Fetch from remote | repoPath, remote (optional, default: 'origin') |
-| `git_merge(repoPath, branch)` | Merge branches | repoPath, branch |
+These tools execute local Git commands via the `simple-git` library. They operate on the local filesystem.
 
-### Usage Examples
+### Repository Initialization & Status
+
+#### `git_init`
+Initialize a new Git repository.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `repoPath` (string) - Path where to initialize the repository |
+| **Output** | String - Success message |
+| **Git Operation** | `git init` |
+| **Permissions** | Local filesystem access only |
 
 ```javascript
-// Initialize and setup a repository
-await git_init('/path/to/project');
-await git_add('/path/to/project', '.');
-await git_commit('/path/to/project', 'Initial commit');
-await git_remote_add('/path/to/project', 'origin', 'https://github.com/user/repo.git');
-await git_push('/path/to/project', 'origin', 'main', true);
+// Input
+{ "repoPath": "/path/to/project" }
 
-// Check status and view history
-await git_status('/path/to/project');
-await git_log('/path/to/project', 5);
-
-// Branch operations
-await git_checkout('/path/to/project', 'feature-branch', true);
-await git_branch_list('/path/to/project');
+// Output
+"Initialized empty Git repository in /path/to/project"
 ```
 
 ---
 
-## 🐙 GitHub API Operations (37 functions)
+#### `git_status`
+Get the status of a Git repository.
 
-These tools interact with GitHub's REST API using your personal access token.
+| Property | Details |
+|----------|---------|
+| **Input** | `repoPath` (string) - Path to the repository |
+| **Output** | Object - Status object with modified, staged, untracked files |
+| **Git Operation** | `git status` |
+| **Permissions** | Local filesystem access only |
 
-# GitHub Tools Reference (Token Permission Compatible)
+```javascript
+// Input
+{ "repoPath": "/path/to/project" }
 
-This document provides an overview of all GitHub API functions in `src/github.js` that are **compatible with your token permissions**.
-
-## 🔐 Your Token Permissions
-
-- ✅ **Read access**: issues, metadata, pull requests, repository advisories
-- ✅ **Read and Write access**: code (files, branches, commits)
-- ✅ **Administration**: Read and Write (for creating repositories)
-
-## 📦 Repository Operations (5 functions) - Read/Write
-
-| Function | Description | Parameters |
-|----------|-------------|------------|
-| `getMyRepos()` | Get all repositories for authenticated user | None |
-| `getRepo(owner, repo)` | Get details of a specific repository | owner, repo |
-| `listForks(owner, repo)` | List all forks of a repository | owner, repo |
-| `getRepoTopics(owner, repo)` | Get repository topics/tags | owner, repo |
-| `createRepo(name, description, isPrivate, autoInit)` | ✏️ Create a new repository | name, description (optional), isPrivate (optional), autoInit (optional) |
-
-## 🐛 Issue Operations (3 functions) - Read Only
-
-| Function | Description | Parameters |
-|----------|-------------|------------|
-| `listIssues(owner, repo, state)` | List repository issues | owner, repo, state (default: "open") |
-| `getIssue(owner, repo, issueNumber)` | Get specific issue details | owner, repo, issueNumber |
-| `listIssueComments(owner, repo, issueNumber)` | List all comments on an issue | owner, repo, issueNumber |
-
-## 🔀 Pull Request Operations (5 functions) - Read Only
-
-| Function | Description | Parameters |
-|----------|-------------|------------|
-| `listPullRequests(owner, repo, state)` | List pull requests | owner, repo, state (default: "open") |
-| `getPullRequest(owner, repo, prNumber)` | Get PR details | owner, repo, prNumber |
-| `listPRReviews(owner, repo, prNumber)` | List PR reviews | owner, repo, prNumber |
-| `listPRFiles(owner, repo, prNumber)` | List files changed in PR | owner, repo, prNumber |
-| `listPRComments(owner, repo, prNumber)` | List PR comments | owner, repo, prNumber |
-
-## 🌿 Branch Operations (5 functions) - Read/Write
-
-| Function | Description | Parameters |
-|----------|-------------|------------|
-| `listBranches(owner, repo)` | List all branches | owner, repo |
-| `getBranch(owner, repo, branch)` | Get branch details | owner, repo, branch |
-| `createBranch(owner, repo, newBranch, fromSha)` | ✏️ Create a new branch | owner, repo, newBranch, fromSha |
-| `deleteBranch(owner, repo, branch)` | ✏️ Delete a branch | owner, repo, branch |
-| `getDefaultBranch(owner, repo)` | Get default branch name | owner, repo |
-
-## 📝 Commit Operations (3 functions) - Read Only
-
-| Function | Description | Parameters |
-|----------|-------------|------------|
-| `listCommits(owner, repo, sha, path)` | List commits | owner, repo, sha (optional), path (optional) |
-| `getCommit(owner, repo, sha)` | Get commit details | owner, repo, sha |
-| `compareCommits(owner, repo, base, head)` | Compare two commits | owner, repo, base, head |
-
-## 📄 File Operations (4 functions) - Read/Write
-
-| Function | Description | Parameters |
-|----------|-------------|------------|
-| `getFileContents(owner, repo, path, ref)` | Get file contents | owner, repo, path, ref (optional) |
-| `createOrUpdateFile(owner, repo, path, message, content, sha, branch)` | ✏️ Create or update a file | owner, repo, path, message, content (base64), sha (optional), branch (optional) |
-| `deleteFile(owner, repo, path, message, sha, branch)` | ✏️ Delete a file | owner, repo, path, message, sha, branch (optional) |
-| `getDirectoryContents(owner, repo, path, ref)` | Get directory contents | owner, repo, path (default: ""), ref (optional) |
-
-## 🌳 Tree Operations (1 function) - Read Only
-
-| Function | Description | Parameters |
-|----------|-------------|------------|
-| `getTree(owner, repo, treeSha, recursive)` | Get git tree | owner, repo, treeSha, recursive (default: false) |
-
-## 💾 Blob Operations (2 functions) - Read/Write
-
-| Function | Description | Parameters |
-|----------|-------------|------------|
-| `getBlob(owner, repo, fileSha)` | Get git blob | owner, repo, fileSha |
-| `createBlob(owner, repo, content, encoding)` | ✏️ Create git blob | owner, repo, content, encoding (default: "utf-8") |
-
-## 🛡️ Repository Advisories (2 functions) - Read Only
-
-| Function | Description | Parameters |
-|----------|-------------|------------|
-| `listRepositoryAdvisories(owner, repo)` | List security advisories | owner, repo |
-| `getRepositoryAdvisory(owner, repo, ghsaId)` | Get specific advisory | owner, repo, ghsaId |
-
-## 🔍 Search Operations (4 functions) - Read Only
-
-| Function | Description | Parameters |
-|----------|-------------|------------|
-| `searchRepositories(query, sort, order)` | Search repositories | query, sort (optional), order (default: "desc") |
-| `searchCode(query, sort, order)` | Search code | query, sort (optional), order (default: "desc") |
-| `searchIssues(query, sort, order)` | Search issues/PRs | query, sort (optional), order (default: "desc") |
-| `searchCommits(query, sort, order)` | Search commits | query, sort (optional), order (default: "desc") |
-
-## 🏷️ Tags Operations (1 function) - Read Only
-
-| Function | Description | Parameters |
-|----------|-------------|------------|
-| `listTags(owner, repo)` | List repository tags | owner, repo |
-
-## 📊 Diff Operations (2 functions) - Read Only
-
-| Function | Description | Parameters |
-|----------|-------------|------------|
-| `getPullRequestDiff(owner, repo, prNumber)` | Get PR diff | owner, repo, prNumber |
-| `getCommitDiff(owner, repo, sha)` | Get commit diff | owner, repo, sha |
+// Output
+{
+  "current": "main",
+  "tracking": "origin/main",
+  "modified": ["file1.js"],
+  "staged": [],
+  "not_added": ["newfile.txt"]
+}
+```
 
 ---
 
-## 📊 Summary
+### Staging & Committing
 
-**Total Functions: 57**
+#### `git_add`
+Stage files for commit.
 
-**Local Git CLI Operations: 20**
-- Repository Initialization & Status: 2
-- Staging & Committing: 2
-- Remote Operations: 6
-- History & Inspection: 2
-- Branch Operations: 3
-- Advanced Operations: 5
+| Property | Details |
+|----------|---------|
+| **Input** | `repoPath` (string), `files` (string or array) - Use `'.'` for all files |
+| **Output** | String - Success message |
+| **Git Operation** | `git add <files>` |
+| **Permissions** | Local filesystem access only |
 
-**GitHub API Operations: 37**
-- Repository Operations: 5 (Read/Write)
-- Issue Operations: 3 (Read)
-- Pull Request Operations: 5 (Read)
-- Branch Operations: 5 (Read/Write)
-- Commit Operations: 3 (Read)
-- File Operations: 4 (Read/Write)
-- Tree Operations: 1 (Read)
-- Blob Operations: 2 (Read/Write)
-- Repository Advisories: 2 (Read)
-- Search Operations: 4 (Read)
-- Tags Operations: 1 (Read)
-- Diff Operations: 2 (Read)
-
-**Read-Only Functions**: 28  
-**Read/Write Functions**: 29 (9 GitHub API + 20 Local Git CLI)
-
-## ⚠️ Removed Functions
-
-The following operations were **removed** because they require permissions you don't have:
-
-- ❌ Delete/Update repository settings (requires admin access)
-- ❌ Fork repositories (requires write access to user scope)
-- ❌ Create/Update/Close issues (requires write access to issues)
-- ❌ Create/Update/Merge pull requests (requires write access to pull requests)
-- ❌ Create/Delete releases (requires write access to releases)
-- ❌ Add/Remove collaborators (requires admin access)
-- ❌ Trigger/Cancel workflows (requires write access to actions)
-- ❌ Create/Update/Delete gists (requires gist scope)
-- ❌ Create/Delete labels (requires write access to issues)
-- ❌ Create/Update/Delete milestones (requires write access to issues)
-- ❌ User/Organization write operations (requires user scope)
-
-## 🚀 Usage Examples
-
-### Reading Repository Information
 ```javascript
-import { getMyRepos, getRepo, listBranches } from './src/github.js';
+// Input - Stage all files
+{ "repoPath": "/path/to/project", "files": "." }
 
-// Get all your repositories
-const repos = await getMyRepos();
+// Input - Stage specific files
+{ "repoPath": "/path/to/project", "files": ["file1.js", "file2.js"] }
 
-// Get specific repo details
-const repo = await getRepo('owner', 'repo-name');
-
-// List branches
-const branches = await listBranches('owner', 'repo-name');
+// Output
+"Added . to staging area"
 ```
 
-### Working with Code (Read/Write)
+---
+
+#### `git_commit`
+Create a commit with staged changes.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `repoPath` (string), `message` (string) - Commit message |
+| **Output** | Object - Commit result with hash and summary |
+| **Git Operation** | `git commit -m "<message>"` |
+| **Permissions** | Local filesystem access only |
+
 ```javascript
-import { 
-  getFileContents, 
-  createOrUpdateFile, 
-  createBranch,
-  getCommit 
-} from './src/github.js';
+// Input
+{ "repoPath": "/path/to/project", "message": "Add new feature" }
 
-// Read a file
-const file = await getFileContents('owner', 'repo', 'path/to/file.js');
-
-// Create a new branch
-const newBranch = await createBranch('owner', 'repo', 'feature-branch', 'base-sha');
-
-// Update a file (content must be base64 encoded)
-const content = Buffer.from('console.log("Hello");').toString('base64');
-await createOrUpdateFile(
-  'owner', 
-  'repo', 
-  'path/to/file.js',
-  'Update file',
-  content,
-  'file-sha', // required for updates
-  'feature-branch'
-);
+// Output
+{
+  "branch": "main",
+  "commit": "abc1234",
+  "summary": { "changes": 3, "insertions": 45, "deletions": 12 }
+}
 ```
 
-### Reading Issues and PRs
-```javascript
-import { 
-  listIssues, 
-  getIssue, 
-  listPullRequests,
-  getPullRequest,
-  listPRFiles 
-} from './src/github.js';
+---
 
-// List open issues
-const issues = await listIssues('owner', 'repo', 'open');
+### Remote Operations
 
-// Get specific issue
-const issue = await getIssue('owner', 'repo', 123);
+#### `git_push`
+Push commits to a remote repository.
 
-// List PRs
-const prs = await listPullRequests('owner', 'repo', 'open');
+| Property | Details |
+|----------|---------|
+| **Input** | `repoPath`, `remote`, `branch`, `setUpstream` (optional boolean) |
+| **Output** | Object - Push result |
+| **Git Operation** | `git push <remote> <branch>` or `git push --set-upstream <remote> <branch>` |
+| **Permissions** | Local + remote write access |
 
-// Get PR files
-const files = await listPRFiles('owner', 'repo', 456);
-```
+---
 
-### Searching
-```javascript
-import { searchCode, searchIssues, searchCommits } from './src/github.js';
+#### `git_pull`
+Pull changes from a remote repository.
 
-// Search for code
-const codeResults = await searchCode('repo:owner/repo function');
+| Property | Details |
+|----------|---------|
+| **Input** | `repoPath`, `remote` (e.g., 'origin'), `branch` (e.g., 'main') |
+| **Output** | Object - Pull result with merge info |
+| **Git Operation** | `git pull <remote> <branch>` |
+| **Permissions** | Local + remote read access |
 
-// Search issues
-const issueResults = await searchIssues('repo:owner/repo is:open label:bug');
+---
 
-// Search commits
-const commitResults = await searchCommits('repo:owner/repo author:username');
-```
+#### `git_clone`
+Clone a repository from a URL.
 
-## 🔐 Authentication
+| Property | Details |
+|----------|---------|
+| **Input** | `url` (string), `targetPath` (string) |
+| **Output** | String - Success message |
+| **Git Operation** | `git clone <url> <targetPath>` |
+| **Permissions** | Remote read access |
 
-All functions use the GitHub personal access token from the `GIT_TOKEN` environment variable:
+---
 
-```bash
-# .env file
-GIT_TOKEN=your_github_personal_access_token
-```
+#### `git_remote_add`
+Add a remote repository.
 
-## ✅ What You Can Do
+| Property | Details |
+|----------|---------|
+| **Input** | `repoPath`, `name` (e.g., 'origin'), `url` |
+| **Output** | String - Success message |
+| **Git Operation** | `git remote add <name> <url>` |
+| **Permissions** | Local filesystem access only |
 
-With your current permissions, you can:
+---
 
-- ✅ **Create new repositories** (public or private, with optional README)
-- ✅ Read repository metadata, issues, PRs, and advisories
-- ✅ Create, update, and delete files in repositories
-- ✅ Create and delete branches
-- ✅ Read commit history and compare commits
-- ✅ Search across repositories, code, issues, and commits
-- ✅ Get file and directory contents
-- ✅ Work with git blobs and trees
-- ✅ View PR diffs and commit diffs
+#### `git_remote_list`
+List all remote repositories.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `repoPath` (string) |
+| **Output** | Array - List of remotes with name, fetch URL, push URL |
+| **Git Operation** | `git remote -v` |
+| **Permissions** | Local filesystem access only |
+
+---
+
+#### `git_remote_remove`
+Remove a remote repository.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `repoPath`, `name` |
+| **Output** | String - Success message |
+| **Git Operation** | `git remote remove <name>` |
+| **Permissions** | Local filesystem access only |
+
+---
+
+### History & Inspection
+
+#### `git_log`
+Get commit history.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `repoPath`, `maxCount` (optional, default: 10) |
+| **Output** | Object - Log with array of commits |
+| **Git Operation** | `git log -n <maxCount>` |
+| **Permissions** | Local filesystem access only |
+
+---
+
+#### `git_diff`
+Show changes (diff) in the repository.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `repoPath`, `options` (optional object, e.g., `{ '--cached': null }`) |
+| **Output** | String - Diff output |
+| **Git Operation** | `git diff [options]` |
+| **Permissions** | Local filesystem access only |
+
+---
+
+### Branch Operations
+
+#### `git_checkout`
+Switch to a branch or create a new branch.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `repoPath`, `branch`, `createNew` (optional boolean) |
+| **Output** | String - Success message |
+| **Git Operation** | `git checkout <branch>` or `git checkout -b <branch>` |
+| **Permissions** | Local filesystem access only |
+
+---
+
+#### `git_branch_list`
+List all local branches.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `repoPath` (string) |
+| **Output** | Object - Branch list with current, all branches |
+| **Git Operation** | `git branch` |
+| **Permissions** | Local filesystem access only |
+
+---
+
+#### `git_branch_delete`
+Delete a local branch.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `repoPath`, `branch`, `force` (optional boolean) |
+| **Output** | String - Success message |
+| **Git Operation** | `git branch -d <branch>` or `git branch -D <branch>` |
+| **Permissions** | Local filesystem access only |
+
+---
+
+### Advanced Operations
+
+#### `git_reset`
+Reset to a specific commit.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `repoPath`, `mode` (optional: 'soft', 'mixed', 'hard'), `commit` (optional, default: 'HEAD') |
+| **Output** | String - Success message |
+| **Git Operation** | `git reset --<mode> <commit>` |
+| **Permissions** | Local filesystem access only |
+
+---
+
+#### `git_stash`
+Stash changes in the working directory.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `repoPath`, `action` (optional: 'save', 'pop', 'list', 'clear') |
+| **Output** | String or Object - Depends on action |
+| **Git Operation** | `git stash [action]` |
+| **Permissions** | Local filesystem access only |
+
+---
+
+#### `git_tag`
+Create a tag.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `repoPath`, `tagName`, `message` (optional, for annotated tags) |
+| **Output** | String - Success message |
+| **Git Operation** | `git tag <tagName>` or `git tag -a <tagName> -m "<message>"` |
+| **Permissions** | Local filesystem access only |
+
+---
+
+#### `git_fetch`
+Fetch from a remote repository.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `repoPath`, `remote` (optional, default: 'origin') |
+| **Output** | Object - Fetch result |
+| **Git Operation** | `git fetch <remote>` |
+| **Permissions** | Remote read access |
+
+---
+
+#### `git_merge`
+Merge a branch into the current branch.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `repoPath`, `branch` |
+| **Output** | Object - Merge result |
+| **Git Operation** | `git merge <branch>` |
+| **Permissions** | Local filesystem access only |
+
+---
+
+## 🐙 GitHub API Tools (37)
+
+These tools interact with GitHub's REST API using authenticated HTTP requests.
+
+---
+
+### Repository Operations (8 tools)
+
+#### `get_my_repositories`
+Fetch all repositories for the authenticated user.
+
+| Property | Details |
+|----------|---------|
+| **Input** | None |
+| **Output** | Array - List of repository objects |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/user/repos` |
+| **Accept Header** | `application/vnd.github+json` |
+| **Token Permissions** | `repo:read` or `public_repo` |
+
+---
+
+#### `get_repo_details`
+Get details of a specific repository.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner` (string), `repo` (string) |
+| **Output** | Object - Repository details |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}` |
+| **Accept Header** | `application/vnd.github+json` |
+| **Token Permissions** | `repo:read` or `public_repo` |
+
+---
+
+#### `list_repo_forks`
+List all forks of a repository.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo` |
+| **Output** | Array - List of fork objects |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/forks` |
+| **Token Permissions** | `repo:read` |
+
+---
+
+#### `get_repo_topics`
+Get repository topics/tags.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo` |
+| **Output** | Object - Topics list |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/topics` |
+| **Accept Header** | `application/vnd.github.mercy-preview+json` ⚠️ Special header |
+| **Token Permissions** | `repo:read` |
+
+---
+
+#### `create_repo`
+Create a new repository for the authenticated user.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `name`, `description` (optional), `isPrivate` (optional), `autoInit` (optional) |
+| **Output** | Object - Created repository |
+| **HTTP Method** | `POST` |
+| **Endpoint** | `/user/repos` |
+| **Token Permissions** | `repo:write` or `admin:repo` |
+
+---
+
+#### `list_repository_advisories`
+List security advisories for a repository.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo` |
+| **Output** | Array - Security advisories |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/security-advisories` |
+| **Token Permissions** | `security_events:read` |
+
+---
+
+#### `get_repository_advisory`
+Get a specific security advisory.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `ghsaId` |
+| **Output** | Object - Advisory details |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/security-advisories/{ghsa_id}` |
+| **Token Permissions** | `security_events:read` |
+
+---
+
+#### `list_tags`
+List all tags in a repository.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo` |
+| **Output** | Array - Tag objects |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/tags` |
+| **Token Permissions** | `repo:read` |
+
+---
+
+### Issue Operations (3 tools)
+
+#### `list_repo_issues`
+List issues for a specific repository.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `state` (optional: 'open', 'closed', 'all') |
+| **Output** | Array - Issue objects |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/issues` |
+| **Token Permissions** | `issues:read` |
+
+---
+
+#### `get_issue`
+Get details of a specific issue.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `issueNumber` (integer) |
+| **Output** | Object - Issue details |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/issues/{issue_number}` |
+| **Token Permissions** | `issues:read` |
+
+---
+
+#### `list_issue_comments`
+List all comments on an issue.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `issueNumber` (integer) |
+| **Output** | Array - Comment objects |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/issues/{issue_number}/comments` |
+| **Token Permissions** | `issues:read` |
+
+---
+
+### Pull Request Operations (6 tools)
+
+#### `list_pull_requests`
+List pull requests for a repository.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `state` (optional: 'open', 'closed', 'all') |
+| **Output** | Array - PR objects |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/pulls` |
+| **Token Permissions** | `pull_requests:read` |
+
+---
+
+#### `get_pull_request`
+Get details of a specific pull request.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `prNumber` (integer) |
+| **Output** | Object - PR details |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/pulls/{pull_number}` |
+| **Token Permissions** | `pull_requests:read` |
+
+---
+
+#### `list_pr_reviews`
+List reviews for a pull request.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `prNumber` (integer) |
+| **Output** | Array - Review objects |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/pulls/{pull_number}/reviews` |
+| **Token Permissions** | `pull_requests:read` |
+
+---
+
+#### `list_pr_files`
+List files changed in a pull request.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `prNumber` (integer) |
+| **Output** | Array - File change objects |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/pulls/{pull_number}/files` |
+| **Token Permissions** | `pull_requests:read` |
+
+---
+
+#### `list_pr_comments`
+List comments on a pull request.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `prNumber` (integer) |
+| **Output** | Array - Comment objects |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/pulls/{pull_number}/comments` |
+| **Token Permissions** | `pull_requests:read` |
+
+---
+
+#### `get_pull_request_diff`
+Get the diff for a pull request.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `prNumber` (integer) |
+| **Output** | String - Raw diff |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/pulls/{pull_number}` |
+| **Accept Header** | `application/vnd.github.v3.diff` ⚠️ Special header |
+| **Token Permissions** | `pull_requests:read` |
+
+---
+
+### Branch Operations (5 tools)
+
+#### `list_branches`
+List all branches in a repository.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo` |
+| **Output** | Array - Branch objects |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/branches` |
+| **Token Permissions** | `repo:read` |
+
+---
+
+#### `get_branch`
+Get details of a specific branch.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `branch` |
+| **Output** | Object - Branch details with protection status |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/branches/{branch}` |
+| **Token Permissions** | `repo:read` |
+
+---
+
+#### `create_branch`
+Create a new branch from a specific commit SHA.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `newBranch`, `fromSha` |
+| **Output** | Object - Ref object |
+| **HTTP Method** | `POST` |
+| **Endpoint** | `/repos/{owner}/{repo}/git/refs` |
+| **Request Body** | `{ "ref": "refs/heads/{newBranch}", "sha": "{fromSha}" }` |
+| **Token Permissions** | `contents:write` |
+
+---
+
+#### `delete_branch`
+Delete a branch from the repository.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `branch` |
+| **Output** | Void (204 No Content) |
+| **HTTP Method** | `DELETE` |
+| **Endpoint** | `/repos/{owner}/{repo}/git/refs/heads/{branch}` |
+| **Token Permissions** | `contents:write` |
+
+---
+
+#### `get_default_branch`
+Get the default branch name for a repository.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo` |
+| **Output** | Object - Repository with default_branch field |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}` |
+| **Token Permissions** | `repo:read` |
+
+---
+
+### Commit Operations (4 tools)
+
+#### `list_commits`
+List commits in a repository.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `sha` (optional), `path` (optional) |
+| **Output** | Array - Commit objects |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/commits` |
+| **Token Permissions** | `repo:read` |
+
+---
+
+#### `get_commit`
+Get details of a specific commit.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `sha` |
+| **Output** | Object - Commit details with files |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/commits/{sha}` |
+| **Token Permissions** | `repo:read` |
+
+---
+
+#### `compare_commits`
+Compare two commits.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `base`, `head` |
+| **Output** | Object - Comparison with files, commits |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/compare/{base}...{head}` |
+| **Token Permissions** | `repo:read` |
+
+---
+
+#### `get_commit_diff`
+Get the diff for a commit.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `sha` |
+| **Output** | String - Raw diff |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/commits/{sha}` |
+| **Accept Header** | `application/vnd.github.v3.diff` ⚠️ Special header |
+| **Token Permissions** | `repo:read` |
+
+---
+
+### File Operations (4 tools)
+
+#### `get_file_contents`
+Get the contents of a file from the repository.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `path`, `ref` (optional) |
+| **Output** | Object - File content (base64 encoded in `content` field) |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/contents/{path}` |
+| **Token Permissions** | `contents:read` |
+
+---
+
+#### `create_or_update_file`
+Create or update a file in the repository.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `path`, `message`, `content` (base64), `sha` (required for update), `branch` (optional) |
+| **Output** | Object - Commit and content details |
+| **HTTP Method** | `PUT` |
+| **Endpoint** | `/repos/{owner}/{repo}/contents/{path}` |
+| **Token Permissions** | `contents:write` |
+
+> ⚠️ **Note**: Content must be base64 encoded. Use `Buffer.from(text).toString('base64')` in Node.js.
+
+---
+
+#### `delete_file`
+Delete a file from the repository.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `path`, `message`, `sha`, `branch` (optional) |
+| **Output** | Object - Commit details |
+| **HTTP Method** | `DELETE` |
+| **Endpoint** | `/repos/{owner}/{repo}/contents/{path}` |
+| **Token Permissions** | `contents:write` |
+
+---
+
+#### `get_directory_contents`
+Get the contents of a directory in the repository.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `path` (optional, default: root), `ref` (optional) |
+| **Output** | Array - File/directory objects |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/contents/{path}` |
+| **Token Permissions** | `contents:read` |
+
+---
+
+### Tree & Blob Operations (3 tools)
+
+#### `get_tree`
+Get a git tree object.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `treeSha`, `recursive` (optional boolean) |
+| **Output** | Object - Tree with entries |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/git/trees/{tree_sha}` |
+| **Token Permissions** | `contents:read` |
+
+---
+
+#### `get_blob`
+Get a git blob object.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `fileSha` |
+| **Output** | Object - Blob with content (base64) |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/repos/{owner}/{repo}/git/blobs/{file_sha}` |
+| **Token Permissions** | `contents:read` |
+
+---
+
+#### `create_blob`
+Create a git blob object.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `owner`, `repo`, `content`, `encoding` (optional, default: 'utf-8') |
+| **Output** | Object - Blob SHA and URL |
+| **HTTP Method** | `POST` |
+| **Endpoint** | `/repos/{owner}/{repo}/git/blobs` |
+| **Token Permissions** | `contents:write` |
+
+---
+
+### Search Operations (4 tools)
+
+#### `search_repositories`
+Search for repositories on GitHub.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `query`, `sort` (optional: 'stars', 'forks', 'updated'), `order` (optional) |
+| **Output** | Object - Search results with items |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/search/repositories` |
+| **Token Permissions** | None (public search) |
+
+---
+
+#### `search_code`
+Search for code on GitHub.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `query`, `sort` (optional: 'indexed'), `order` (optional) |
+| **Output** | Object - Search results with items |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/search/code` |
+| **Token Permissions** | `repo:read` (for private repos) |
+
+---
+
+#### `search_issues`
+Search for issues and pull requests on GitHub.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `query`, `sort` (optional: 'comments', 'created', 'updated'), `order` (optional) |
+| **Output** | Object - Search results with items |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/search/issues` |
+| **Token Permissions** | None (public search) |
+
+---
+
+#### `search_commits`
+Search for commits on GitHub.
+
+| Property | Details |
+|----------|---------|
+| **Input** | `query`, `sort` (optional: 'author-date', 'committer-date'), `order` (optional) |
+| **Output** | Object - Search results with items |
+| **HTTP Method** | `GET` |
+| **Endpoint** | `/search/commits` |
+| **Token Permissions** | `repo:read` (for private repos) |
+
+---
+
+## 🔐 Token Permissions Matrix
+
+### Summary by Category
+
+| Category | Read Permission | Write Permission |
+|----------|-----------------|------------------|
+| **Repository** | `repo:read` | `repo:write`, `admin:repo` |
+| **Issues** | `issues:read` | `issues:write` |
+| **Pull Requests** | `pull_requests:read` | `pull_requests:write` |
+| **Contents/Files** | `contents:read` | `contents:write` |
+| **Security** | `security_events:read` | `security_events:write` |
+| **Search** | Public: None, Private: `repo:read` | N/A |
+
+### Tools by Permission Required
+
+#### Read-Only Tools (28 tools)
+No write permissions needed:
+
+| Tools | Permission |
+|-------|------------|
+| `get_my_repositories`, `get_repo_details`, `list_repo_forks`, `get_repo_topics`, `list_tags` | `repo:read` |
+| `list_repository_advisories`, `get_repository_advisory` | `security_events:read` |
+| `list_repo_issues`, `get_issue`, `list_issue_comments` | `issues:read` |
+| `list_pull_requests`, `get_pull_request`, `list_pr_reviews`, `list_pr_files`, `list_pr_comments`, `get_pull_request_diff` | `pull_requests:read` |
+| `list_branches`, `get_branch`, `get_default_branch` | `repo:read` |
+| `list_commits`, `get_commit`, `compare_commits`, `get_commit_diff` | `repo:read` |
+| `get_file_contents`, `get_directory_contents`, `get_tree`, `get_blob` | `contents:read` |
+| `search_*` | None or `repo:read` |
+
+#### Write Tools (9 GitHub API tools)
+Require write/admin permissions:
+
+| Tool | Permission Required |
+|------|---------------------|
+| `create_repo` | `repo:write` or `admin:repo` |
+| `create_branch` | `contents:write` |
+| `delete_branch` | `contents:write` |
+| `create_or_update_file` | `contents:write` |
+| `delete_file` | `contents:write` |
+| `create_blob` | `contents:write` |
+
+#### Git CLI Tools (20 tools)
+All Git CLI tools require only local filesystem access. No GitHub token permissions needed for local operations.
+
+---
+
+## ⚠️ Operations NOT Supported
+
+The following operations are **not implemented** as they require permissions beyond typical token scopes:
+
+- ❌ Fork repositories
+- ❌ Create/update/close issues
+- ❌ Create/update/merge pull requests  
+- ❌ Create/delete releases
+- ❌ Add/remove collaborators
+- ❌ Trigger/cancel workflows
+- ❌ Create/update/delete gists
+- ❌ Create/delete labels and milestones
+- ❌ Delete/update repository settings
+
+---
+
+**Total Tools: 57** | **GitHub API: 37** | **Git CLI: 20** | **Read-Only: 28** | **Read/Write: 29**
