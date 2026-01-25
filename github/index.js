@@ -5,7 +5,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import config from './src/config/index.js';
 import { registerAllTools } from './src/tools/index.js';
-import { logger } from './src/utils/index.js';
+import logger from './src/utils/logger.js';
 
 /**
  * Initialize and configure the MCP server
@@ -26,8 +26,8 @@ function createServer() {
   return server;
 } catch (error) {
     logger.error('Failed to create server:', error);
-    
-  process.exit(1);
+    process.exit(1);
+    return null; // This line will never execute but satisfies ESLint
 } 
 }
 

@@ -44,8 +44,11 @@ function validateConfig() {
   }
 
   if (errors.length > 0) {
+    // Using console.error here instead of logger to avoid circular dependency
+    /* eslint-disable no-console */
     console.error('Configuration validation failed:');
     errors.forEach(error => console.error(`  - ${error}`));
+    /* eslint-enable no-console */
     // Don't exit, just warn - allow server to start for testing
   }
 

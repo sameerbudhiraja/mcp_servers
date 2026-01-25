@@ -1,262 +1,266 @@
-# GitHub MCP Server - Refactored Architecture
+# GitHub MCP Server
 
-A professionally structured Model Context Protocol (MCP) server providing GitHub API operations and local Git CLI commands.
+A comprehensive Model Context Protocol (MCP) server providing **57 tools** for GitHub API operations and local Git CLI commands. Built with industry-standard modular architecture.
+
+---
+
+## 📊 Quick Stats
+
+| Category | Count |
+|----------|-------|
+| **Total Tools** | 57 |
+| **GitHub API Tools** | 37 |
+| **Git CLI Tools** | 20 |
+| **Read-Only Operations** | 28 |
+| **Read/Write Operations** | 29 |
+
+---
 
 ## 🏗️ Architecture Overview
 
-This codebase follows industry-standard patterns with clear separation of concerns:
+This server follows a layered, modular architecture with clear separation of concerns:
 
 ```
 github/
+├── index.js                 # Main entry point - Server initialization
 ├── src/
-│   ├── config/              # Configuration management
-│   │   └── index.js         # Environment variables & app config
-│   ├── constants/           # Application constants
-│   │   ├── index.js         # Central export
-│   │   ├── endpoints.js     # GitHub API endpoints
-│   │   ├── errorMessages.js # Error message templates
-│   │   └── toolSchemas.js   # Zod validation schemas
-│   ├── services/            # Business logic layer
-│   │   ├── githubClient.js  # Configured axios instance
-│   │   ├── github/          # GitHub API services
+│   ├── config/              # Configuration Layer
+│   │   └── index.js         # Environment variables, validation, defaults
+│   ├── constants/           # Constants Layer
+│   │   ├── index.js         # Central export aggregator
+│   │   ├── endpoints.js     # GitHub REST API endpoint definitions
+│   │   ├── error-messages.js # Standardized error message templates
+│   │   └── tool-schemas.js  # Zod validation schemas for all 57 tools
+│   ├── services/            # Business Logic Layer
+│   │   ├── github-client.js # Configured Axios instance with interceptors
+│   │   ├── github/          # GitHub API service modules
 │   │   │   ├── index.js     # Service aggregator
-│   │   │   ├── repository.js
-│   │   │   ├── issue.js
-│   │   │   ├── pullRequest.js
-│   │   │   ├── branch.js
-│   │   │   ├── commit.js
-│   │   │   ├── file.js
-│   │   │   ├── tree.js
-│   │   │   └── search.js
-│   │   └── git/             # Git CLI services
-│   │       └── index.js
-│   ├── tools/               # MCP tool registrations
+│   │   │   ├── repository.js # Repository operations
+│   │   │   ├── issue.js     # Issue operations
+│   │   │   ├── pull-requests.js # PR operations
+│   │   │   ├── branch.js    # Branch operations
+│   │   │   ├── commit.js    # Commit operations
+│   │   │   ├── file.js      # File/directory operations
+│   │   │   ├── tree.js      # Git tree operations
+│   │   │   └── search.js    # Search operations
+│   │   └── git/             # Local Git CLI service
+│   │       └── index.js     # 20 Git CLI operations via simple-git
+│   ├── tools/               # MCP Tool Registration Layer
 │   │   ├── index.js         # Tool registration orchestrator
 │   │   ├── github/          # GitHub tool registrations
 │   │   │   └── index.js
 │   │   └── git/             # Git CLI tool registrations
 │   │       └── index.js
-│   └── utils/               # Utility functions
+│   └── utils/               # Utility Layer
 │       ├── index.js         # Utility aggregator
-│       ├── errorHandler.js  # Error handling
-│       ├── responseFormatter.js # Response formatting
-│       └── logger.js        # Logging utilities
-├── index.js                 # Main server entry point
-├── package.json
-└── .env                     # Environment variables
+│       ├── error-handler.js # Centralized error handling
+│       ├── response-formatter.js # Response formatting
+│       └── logger.js        # Winston logger configuration
+├── logs/                    # Log files (auto-generated)
+├── .env                     # Environment configuration
+├── .env.example             # Environment template
+└── package.json
 ```
 
-## 🎯 Key Features
+### Architecture Layers
 
-### 1. **Separation of Concerns**
-- **Config Layer**: Centralized configuration with validation
-- **Constants Layer**: All constants, endpoints, and schemas in one place
-- **Service Layer**: Business logic separated from presentation
-- **Tools Layer**: MCP tool registrations with consistent error handling
-- **Utils Layer**: Reusable utilities for error handling, logging, and formatting
-
-### 2. **Type Safety**
-- Zod schemas for all tool inputs
-- Centralized schema definitions for consistency
-- Runtime validation of all inputs
-
-### 3. **Error Handling**
-- Centralized error handling utilities
-- Consistent error messages
-- Proper error logging and formatting
-- Graceful error recovery
-
-### 4. **Maintainability**
-- Each file has a single responsibility
-- Easy to locate and modify specific functionality
-- Clear module boundaries
-- Comprehensive JSDoc comments
-
-### 5. **Scalability**
-- Easy to add new tools and services
-- Modular architecture supports growth
-- Services can be reused across tools
-
-## 📦 Installation
-
-```bash
-npm install
-```
-
-## ⚙️ Configuration
-
-Create a `.env` file with the following variables:
-
-```env
-# Required
-GIT_TOKEN=your_github_personal_access_token
-
-# Optional
-NODE_ENV=development
-GIT_API_VERSION=2022-11-28
-GIT_BASE_URL=https://api.github.com
-GIT_TIMEOUT=30000
-LOG_LEVEL=error
-LOGGING_ENABLED=true
-```
-
-## 🚀 Usage
-
-Start the MCP server:
-
-```bash
-node index.js
-```
-
-## 🛠️ Available Tools
-
-### GitHub API Operations
-
-#### Repository Operations
-- `get_my_repositories` - Fetch all user repositories
-- `get_repo_details` - Get repository details
-- `list_repo_forks` - List repository forks
-- `get_repo_topics` - Get repository topics
-- `create_repo` - Create a new repository
-- `list_tags` - List repository tags
-
-#### Issue Operations
-- `list_repo_issues` - List repository issues
-- `get_issue` - Get issue details
-- `list_issue_comments` - List issue comments
-
-#### Pull Request Operations
-- `list_pull_requests` - List pull requests
-- `get_pull_request` - Get PR details
-- `list_pr_reviews` - List PR reviews
-- `list_pr_files` - List PR files
-- `list_pr_comments` - List PR comments
-- `get_pull_request_diff` - Get PR diff
-
-#### Branch Operations
-- `list_branches` - List branches
-- `get_branch` - Get branch details
-- `create_branch` - Create a new branch
-- `delete_branch` - Delete a branch
-- `get_default_branch` - Get default branch name
-
-#### Commit Operations
-- `list_commits` - List commits
-- `get_commit` - Get commit details
-- `compare_commits` - Compare two commits
-- `get_commit_diff` - Get commit diff
-
-#### File Operations
-- `get_file_contents` - Get file contents
-- `create_or_update_file` - Create or update a file
-- `delete_file` - Delete a file
-- `get_directory_contents` - Get directory contents
-
-#### Tree & Blob Operations
-- `get_tree` - Get git tree
-- `get_blob` - Get git blob
-- `create_blob` - Create git blob
-
-#### Search Operations
-- `search_repositories` - Search repositories
-- `search_code` - Search code
-- `search_issues` - Search issues
-- `search_commits` - Search commits
-
-#### Security Operations
-- `list_repository_advisories` - List security advisories
-- `get_repository_advisory` - Get specific advisory
-
-### Git CLI Operations
-
-- `git_init` - Initialize repository
-- `git_status` - Get repository status
-- `git_add` - Stage files
-- `git_commit` - Create commit
-- `git_push` - Push to remote
-- `git_pull` - Pull from remote
-- `git_clone` - Clone repository
-- `git_remote_add` - Add remote
-- `git_remote_list` - List remotes
-- `git_remote_remove` - Remove remote
-- `git_log` - View commit history
-- `git_diff` - Show changes
-- `git_reset` - Reset to commit
-- `git_checkout` - Switch branches
-- `git_branch_list` - List branches
-- `git_branch_delete` - Delete branch
-- `git_stash` - Stash changes
-- `git_tag` - Create tag
-- `git_fetch` - Fetch from remote
-- `git_merge` - Merge branches
-
-## 🔧 Development
-
-### Adding a New Service
-
-1. Create service file in `src/services/github/` or `src/services/git/`
-2. Export functions from the service
-3. Add exports to `src/services/github/index.js` or `src/services/git/index.js`
-
-### Adding a New Tool
-
-1. Add schema to `src/constants/toolSchemas.js`
-2. Register tool in `src/tools/github/index.js` or `src/tools/git/index.js`
-3. Use service functions and utility formatters
-
-### Project Structure Benefits
-
-- **Easy Testing**: Each module can be tested independently
-- **Clear Dependencies**: Import paths show module relationships
-- **Code Reuse**: Services shared across multiple tools
-- **Consistent Patterns**: All tools follow the same structure
-- **Easy Onboarding**: New developers can quickly understand the codebase
-
-## 📝 Code Style
-
-- **ES6+ JavaScript** with CommonJS modules
-- **JSDoc comments** for all public functions
-- **Consistent error handling** using utility functions
-- **Descriptive variable names** following camelCase
-- **Modular design** with single responsibility principle
-
-## 🔍 Logging
-
-Configure logging via environment variables:
-
-```env
-LOG_LEVEL=debug|info|warn|error
-LOGGING_ENABLED=true|false
-```
-
-Logs include:
-- Server startup/shutdown
-- Configuration validation
-- Error details with context
-- Tool execution (debug level)
-
-## 🤝 Contributing
-
-When contributing:
-1. Follow the existing code structure
-2. Add JSDoc comments to new functions
-3. Use the centralized utilities for errors and responses
-4. Add schemas for new tool inputs
-5. Keep services focused on single responsibilities
-
-## 📄 License
-
-[Your License Here]
-
-## 🙏 Acknowledgments
-
-Built with:
-- [@modelcontextprotocol/sdk](https://github.com/modelcontextprotocol/sdk) - MCP SDK
-- [axios](https://github.com/axios/axios) - HTTP client
-- [simple-git](https://github.com/steveukx/git-js) - Git CLI wrapper
-- [zod](https://github.com/colinhacks/zod) - Schema validation
+| Layer | Purpose | Key Files |
+|-------|---------|-----------|
+| **Config** | Environment variables, validation | `src/config/index.js` |
+| **Constants** | Endpoints, schemas, error messages | `src/constants/*` |
+| **Services** | Business logic, API/CLI operations | `src/services/*` |
+| **Tools** | MCP tool registration & handlers | `src/tools/*` |
+| **Utils** | Cross-cutting concerns | `src/utils/*` |
 
 ---
 
-**Previous Structure**: Monolithic 1000+ line `index.js`  
-**New Structure**: Modular, maintainable, industry-standard architecture ✨
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Node.js** v18.0.0 or higher
+- **Git** installed and accessible via command line
+- **GitHub Personal Access Token** with required permissions
+
+### Installation
+
+```bash
+# Clone or navigate to the project directory
+cd /path/to/github-mcp-server
+
+# Install dependencies
+npm install
+```
+
+### Configuration
+
+1. **Create environment file** from template:
+```bash
+cp .env.example .env
+```
+
+2. **Edit `.env`** with your configuration:
+
+```env
+# =========================
+# GitHub API Configuration (REQUIRED)
+# =========================
+GIT_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxx   # Your GitHub Personal Access Token
+
+# =========================
+# Optional Configuration
+# =========================
+NODE_ENV=development                  # development | production
+GIT_API_VERSION=2022-11-28           # GitHub API version
+GIT_BASE_URL=https://api.github.com  # GitHub API base URL
+GIT_TIMEOUT=30000                    # Request timeout in ms
+
+# =========================
+# Logging Configuration
+# =========================
+LOG_LEVEL=error                      # debug | info | warn | error
+LOGGING_ENABLED=true                 # Enable/disable logging
+LOG_FILE_ENABLED=true                # Enable file logging
+LOG_MAX_FILE_SIZE=20m                # Max size per log file
+LOG_MAX_FILES=14d                    # Log retention period
+```
+
+### Running the Server
+
+```bash
+# Start the MCP server
+node index.js
+
+# The server runs via stdio transport for MCP communication
+```
+
+### MCP Client Configuration
+
+Add to your MCP client configuration (e.g., Claude Desktop, VS Code extension):
+
+```json
+{
+  "mcpServers": {
+    "github": {
+      "command": "node",
+      "args": ["/absolute/path/to/github/index.js"],
+      "env": {
+        "GIT_TOKEN": "your_github_token_here"
+      }
+    }
+  }
+}
+```
+
+---
+
+## 🔐 Token Permissions Required
+
+Your GitHub Personal Access Token needs the following permissions based on desired functionality:
+
+| Permission | Scope | Required For |
+|------------|-------|--------------|
+| **repo** | Full control of private repositories | All repository operations |
+| **read:repo** | Read access to repositories | Reading repo data, issues, PRs |
+| **contents:write** | Write access to code | File CRUD, branch operations |
+| **issues:read** | Read access to issues | Listing/viewing issues |
+| **pull_requests:read** | Read access to PRs | Listing/viewing PRs |
+| **security_events:read** | Read access to security advisories | Security advisory tools |
+| **metadata:read** | Read access to metadata | Basic repo metadata |
+
+### Minimum Permissions for Read-Only Usage
+- `repo:read` or `public_repo`
+- `issues:read`
+- `pull_requests:read`
+- `metadata:read`
+
+### Full Permissions for Read/Write Usage
+- `repo` (full control)
+- `admin:repo_hook` (for repository administration)
+
+---
+
+## 🛠️ Available Tools
+
+### GitHub API Tools (37)
+
+| Category | Tools | Operations |
+|----------|-------|------------|
+| **Repository** | 8 | Get repos, details, forks, topics, create repo, tags, advisories |
+| **Issues** | 3 | List issues, get issue, list comments |
+| **Pull Requests** | 6 | List PRs, get PR, reviews, files, comments, diff |
+| **Branches** | 5 | List, get, create, delete, get default branch |
+| **Commits** | 4 | List, get details, compare, get diff |
+| **Files** | 4 | Get contents, create/update, delete, get directory |
+| **Trees/Blobs** | 3 | Get tree, get blob, create blob |
+| **Search** | 4 | Search repos, code, issues, commits |
+
+### Git CLI Tools (20)
+
+| Category | Tools | Operations |
+|----------|-------|------------|
+| **Repository Setup** | 2 | init, status |
+| **Staging/Commit** | 2 | add, commit |
+| **Remote** | 6 | push, pull, clone, remote add/list/remove |
+| **History** | 2 | log, diff |
+| **Branching** | 3 | checkout, branch list, branch delete |
+| **Advanced** | 5 | reset, stash, tag, fetch, merge |
+
+> 📚 **See [GIT_TOOLS_REFERENCE.md](./GIT_TOOLS_REFERENCE.md) for detailed tool documentation**
+
+---
+
+## 🔧 Development
+
+### Adding a New GitHub API Tool
+
+1. **Add endpoint** to `src/constants/endpoints.js`
+2. **Define schema** in `src/constants/tool-schemas.js`
+3. **Create service function** in appropriate `src/services/github/*.js`
+4. **Register tool** in `src/tools/github/index.js`
+
+### Adding a New Git CLI Tool
+
+1. **Define schema** in `src/constants/tool-schemas.js`
+2. **Create service function** in `src/services/git/index.js`
+3. **Register tool** in `src/tools/git/index.js`
+
+### Code Style
+
+- ES6+ JavaScript with ESM modules
+- Airbnb ESLint configuration
+- Prettier formatting
+- JSDoc comments for all public functions
+
+---
+
+## 📝 Logging
+
+Logs are written to `./logs/` directory with daily rotation:
+
+- `combined-YYYY-MM-DD.log` - All logs
+- `error-YYYY-MM-DD.log` - Error logs only
+
+Configure via environment variables:
+```env
+LOG_LEVEL=debug|info|warn|error
+LOGGING_ENABLED=true|false
+LOG_FILE_ENABLED=true|false
+```
+
+---
+
+## 📦 Dependencies
+
+| Package | Purpose |
+|---------|---------|
+| `@modelcontextprotocol/sdk` | MCP server SDK |
+| `axios` | HTTP client for GitHub API |
+| `simple-git` | Git CLI wrapper |
+| `zod` | Schema validation |
+| `winston` | Logging framework |
+| `dotenv` | Environment configuration |
+
+---
+
+*Built with ❤️*

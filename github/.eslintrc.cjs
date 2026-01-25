@@ -18,10 +18,10 @@ module.exports = {
 
   rules: {
     // ---- Code Quality ----
-    'no-console': 'off',
+    'no-console': 'error', // Error for console statements (use logger instead)
     'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     'no-undef': 'error',
-    'no-shadow': 'off',
+    'no-shadow': 'warn',
     'no-underscore-dangle': ['error', { allow: ['__dirname', '__filename'] }],
 
     // ---- Imports ----
@@ -32,21 +32,21 @@ module.exports = {
         js: 'always'
       }
     ],
-    'import/prefer-default-export': 'off',
-    'import/no-unresolved': 'off',
+    'import/prefer-default-export': 'off', // Allow named exports
+    'import/no-unresolved': 'off', // Imports work fine at runtime with ES modules
 
     // ---- Style ----
-    'arrow-body-style': 'off',
-    'class-methods-use-this': 'off',
-    'consistent-return': 'off',
+    'arrow-body-style': 'off', // Allow both arrow function styles
+    'class-methods-use-this': 'warn',
+    'consistent-return': 'warn',
 
     // ---- Async / Await ----
-    'no-return-await': 'off',
-    'no-await-in-loop': 'off',
+    'no-return-await': 'warn',
+    'no-await-in-loop': 'warn',
 
     // ---- Best Practices ----
-    'no-param-reassign': 'off',
-    'no-use-before-define': 'off',
+    'no-param-reassign': 'warn',
+    'no-use-before-define': 'warn',
   },
 
   settings: {
