@@ -1,8 +1,8 @@
 {
-  "name": "github-mcp-server",
-  "type": "module",
+  "name": "bitbucket-mcp-server",
   "version": "1.0.0",
-  "description": "mcp server for github",
+  "type": "module",
+  "description": "mcp server for bitbucket",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -18,12 +18,5 @@
     "winston": "^3.19.0",
     "winston-daily-rotate-file": "^5.0.0",
     "zod": "^3.25.76"
-  },
-  "devDependencies": {
-    "eslint": "^8.57.1",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-import": "^2.32.0",
-    "prettier": "^3.8.0"
   }
 }
