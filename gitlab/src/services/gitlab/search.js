@@ -6,15 +6,15 @@ import gitlab from '../gitlab-client.js';
 /**
  * Search for code across projects
  */
-async function searchCode(searchQuery, projectId = null) {
+async function searchCode(payload) {
   try {
-    if (projectId) {
+    if (payload.projectId) {
       // Project-scoped search
-      const encodedId = encodeURIComponent(projectId);
+      const encodedId = encodeURIComponent(payload.projectId);
       const res = await gitlab.get(`/projects/${encodedId}/search`, {
         params: {
           scope: 'blobs',
-          search: searchQuery,
+          search: payload.searchQuery,
         },
       });
       return res.data;
@@ -24,7 +24,7 @@ async function searchCode(searchQuery, projectId = null) {
     const res = await gitlab.get('/search', {
       params: {
         scope: 'blobs',
-        search: searchQuery,
+        search: payload.searchQuery,
       },
     });
     return res.data;
@@ -36,12 +36,12 @@ async function searchCode(searchQuery, projectId = null) {
 /**
  * Search for projects
  */
-async function searchProjects(searchQuery) {
+async function searchProjects(payload) {
   try {
     const res = await gitlab.get('/search', {
       params: {
         scope: 'projects',
-        search: searchQuery,
+        search: payload.searchQuery,
       },
     });
     return res.data;

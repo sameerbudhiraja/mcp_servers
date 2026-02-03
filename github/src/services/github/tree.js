@@ -6,40 +6,40 @@ import github from '../github-client.js';
 /**
  * Get a git tree
  */
-async function getTree(owner, repo, treeSha, recursive = false) {
+async function getTree(payload) {
   try {
-    const params = recursive ? { recursive: 1 } : {};
-    const res = await github.get(`/repos/${owner}/${repo}/git/trees/${treeSha}`, { params });
+    const params = payload.recursive ? { recursive: 1 } : {};
+    const res = await github.get(`/repos/${payload.owner}/${payload.repo}/git/trees/${payload.treeSha}`, { params });
     return res.data;
   } catch (error) {
-    throw new Error(`Failed to get tree ${treeSha} for ${owner}/${repo}: ${error.message}`);
+    throw new Error(`Failed to get tree ${payload.treeSha} for ${payload.owner}/${payload.repo}: ${error.message}`);
   }
 }
 
 /**
  * Get a git blob
  */
-async function getBlob(owner, repo, fileSha) {
+async function getBlob(payload) {
   try {
-    const res = await github.get(`/repos/${owner}/${repo}/git/blobs/${fileSha}`);
+    const res = await github.get(`/repos/${payload.owner}/${payload.repo}/git/blobs/${payload.fileSha}`);
     return res.data;
   } catch (error) {
-    throw new Error(`Failed to get blob ${fileSha} for ${owner}/${repo}: ${error.message}`);
+    throw new Error(`Failed to get blob ${payload.fileSha} for ${payload.owner}/${payload.repo}: ${error.message}`);
   }
 }
 
 /**
  * Create a git blob
  */
-async function createBlob(owner, repo, content, encoding = 'utf-8') {
+async function createBlob(payload) {
   try {
-    const res = await github.post(`/repos/${owner}/${repo}/git/blobs`, {
-      content,
-      encoding,
+    const res = await github.post(`/repos/${payload.owner}/${payload.repo}/git/blobs`, {
+      content: payload.content,
+      encoding: payload.encoding,
     });
     return res.data;
   } catch (error) {
-    throw new Error(`Failed to create blob for ${owner}/${repo}: ${error.message}`);
+    throw new Error(`Failed to create blob for ${payload.owner}/${payload.repo}: ${error.message}`);
   }
 }
 

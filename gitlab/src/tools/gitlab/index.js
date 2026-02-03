@@ -3,7 +3,7 @@
 
 import { TOOL_DEFINITIONS } from '../../constants/index.js';
 import * as gitlabServices from '../../services/gitlab/index.js';
-import { formatSuccess, formatError, formatText } from '../../utils/index.js';
+import { formatSuccess, formatError } from '../../utils/index.js';
 
 // Get GitLab tool definitions
 const { GITLAB } = TOOL_DEFINITIONS;
@@ -29,36 +29,36 @@ function registerTool(server, toolDef, handler) {
 function registerGitLabTools(server) {
   // ===== PROJECT OPERATIONS =====
   
-  registerTool(server, GITLAB.PROJECT.LIST_PROJECTS, async ({ membership, owned, starred }) => {
+  registerTool(server, GITLAB.PROJECT.LIST_PROJECTS, async ({ payload }) => {
     try {
-      const data = await gitlabServices.listProjects(membership, owned, starred);
+      const data = await gitlabServices.listProjects(payload.membership, payload.owned, payload.starred);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITLAB.PROJECT.GET_PROJECT, async ({ projectId }) => {
+  registerTool(server, GITLAB.PROJECT.GET_PROJECT, async ({ payload }) => {
     try {
-      const data = await gitlabServices.getProject(projectId);
+      const data = await gitlabServices.getProject(payload.projectId);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITLAB.PROJECT.CREATE_PROJECT, async ({ name, description, visibility, initializeWithReadme }) => {
+  registerTool(server, GITLAB.PROJECT.CREATE_PROJECT, async ({ payload }) => {
     try {
-      const data = await gitlabServices.createProject(name, description, visibility, initializeWithReadme);
+      const data = await gitlabServices.createProject(payload.name, payload.description, payload.visibility, payload.initializeWithReadme);
       return formatSuccess(data);
-    } catch (error) {
+    } catch (error) { 
       return formatError(error);
     }
   });
 
-  registerTool(server, GITLAB.PROJECT.LIST_PROJECT_FORKS, async ({ projectId }) => {
+  registerTool(server, GITLAB.PROJECT.LIST_PROJECT_FORKS, async ({ payload }) => {
     try {
-      const data = await gitlabServices.listProjectForks(projectId);
+      const data = await gitlabServices.listProjectForks(payload.projectId);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -67,45 +67,45 @@ function registerGitLabTools(server) {
 
   // ===== MERGE REQUEST OPERATIONS =====
   
-  registerTool(server, GITLAB.MERGE_REQUEST.LIST_MERGE_REQUESTS, async ({ projectId, state }) => {
+  registerTool(server, GITLAB.MERGE_REQUEST.LIST_MERGE_REQUESTS, async ({ payload }) => {
     try {
-      const data = await gitlabServices.listMergeRequests(projectId, state);
+      const data = await gitlabServices.listMergeRequests(payload.projectId, payload.state);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITLAB.MERGE_REQUEST.GET_MERGE_REQUEST, async ({ projectId, mergeRequestIid }) => {
+  registerTool(server, GITLAB.MERGE_REQUEST.GET_MERGE_REQUEST, async ({ payload }) => {
     try {
-      const data = await gitlabServices.getMergeRequest(projectId, mergeRequestIid);
+      const data = await gitlabServices.getMergeRequest(payload.projectId, payload.mergeRequestIid);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITLAB.MERGE_REQUEST.GET_MERGE_REQUEST_DIFF, async ({ projectId, mergeRequestIid }) => {
+  registerTool(server, GITLAB.MERGE_REQUEST.GET_MERGE_REQUEST_DIFF, async ({ payload }) => {
     try {
-      const data = await gitlabServices.getMergeRequestDiff(projectId, mergeRequestIid);
+      const data = await gitlabServices.getMergeRequestDiff(payload.projectId, payload.mergeRequestIid);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITLAB.MERGE_REQUEST.LIST_MR_COMMITS, async ({ projectId, mergeRequestIid }) => {
+  registerTool(server, GITLAB.MERGE_REQUEST.LIST_MR_COMMITS, async ({ payload }) => {
     try {
-      const data = await gitlabServices.listMRCommits(projectId, mergeRequestIid);
+      const data = await gitlabServices.listMRCommits(payload.projectId, payload.mergeRequestIid);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITLAB.MERGE_REQUEST.LIST_MR_COMMENTS, async ({ projectId, mergeRequestIid }) => {
+  registerTool(server, GITLAB.MERGE_REQUEST.LIST_MR_COMMENTS, async ({ payload }) => {
     try {
-      const data = await gitlabServices.listMRComments(projectId, mergeRequestIid);
+      const data = await gitlabServices.listMRComments(payload.projectId, payload.mergeRequestIid);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -114,36 +114,36 @@ function registerGitLabTools(server) {
 
   // ===== BRANCH OPERATIONS =====
   
-  registerTool(server, GITLAB.BRANCH.LIST_BRANCHES, async ({ projectId }) => {
+  registerTool(server, GITLAB.BRANCH.LIST_BRANCHES, async ({ payload }) => {
     try {
-      const data = await gitlabServices.listBranches(projectId);
+      const data = await gitlabServices.listBranches(payload.projectId);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITLAB.BRANCH.GET_BRANCH, async ({ projectId, branchName }) => {
+  registerTool(server, GITLAB.BRANCH.GET_BRANCH, async ({ payload }) => {
     try {
-      const data = await gitlabServices.getBranch(projectId, branchName);
+      const data = await gitlabServices.getBranch(payload.projectId, payload.branchName);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITLAB.BRANCH.CREATE_BRANCH, async ({ projectId, branchName, ref }) => {
+  registerTool(server, GITLAB.BRANCH.CREATE_BRANCH, async ({ payload }) => {
     try {
-      const data = await gitlabServices.createBranch(projectId, branchName, ref);
+      const data = await gitlabServices.createBranch(payload.projectId, payload.branchName, payload.ref);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITLAB.BRANCH.DELETE_BRANCH, async ({ projectId, branchName }) => {
+  registerTool(server, GITLAB.BRANCH.DELETE_BRANCH, async ({ payload }) => {
     try {
-      const data = await gitlabServices.deleteBranch(projectId, branchName);
+      const data = await gitlabServices.deleteBranch(payload.projectId, payload.branchName);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -152,36 +152,36 @@ function registerGitLabTools(server) {
 
   // ===== COMMIT OPERATIONS =====
   
-  registerTool(server, GITLAB.COMMIT.LIST_COMMITS, async ({ projectId, refName }) => {
+  registerTool(server, GITLAB.COMMIT.LIST_COMMITS, async ({ payload }) => {
     try {
-      const data = await gitlabServices.listCommits(projectId, refName);
+      const data = await gitlabServices.listCommits(payload.projectId, payload.refName);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITLAB.COMMIT.GET_COMMIT, async ({ projectId, sha }) => {
+  registerTool(server, GITLAB.COMMIT.GET_COMMIT, async ({ payload }) => {
     try {
-      const data = await gitlabServices.getCommit(projectId, sha);
+      const data = await gitlabServices.getCommit(payload.projectId, payload.sha);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITLAB.COMMIT.GET_COMMIT_DIFF, async ({ projectId, sha }) => {
+  registerTool(server, GITLAB.COMMIT.GET_COMMIT_DIFF, async ({ payload }) => {
     try {
-      const data = await gitlabServices.getCommitDiff(projectId, sha);
+      const data = await gitlabServices.getCommitDiff(payload.projectId, payload.sha);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITLAB.COMMIT.LIST_COMMIT_COMMENTS, async ({ projectId, sha }) => {
+  registerTool(server, GITLAB.COMMIT.LIST_COMMIT_COMMENTS, async ({ payload }) => {
     try {
-      const data = await gitlabServices.listCommitComments(projectId, sha);
+      const data = await gitlabServices.listCommitComments(payload.projectId, payload.sha);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -190,36 +190,36 @@ function registerGitLabTools(server) {
 
   // ===== FILE OPERATIONS =====
   
-  registerTool(server, GITLAB.FILE.GET_FILE, async ({ projectId, filePath, ref }) => {
+  registerTool(server, GITLAB.FILE.GET_FILE, async ({ payload }) => {
     try {
-      const data = await gitlabServices.getFile(projectId, filePath, ref);
+      const data = await gitlabServices.getFile(payload.projectId, payload.filePath, payload.ref);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITLAB.FILE.GET_DIRECTORY, async ({ projectId, path, ref }) => {
+  registerTool(server, GITLAB.FILE.GET_DIRECTORY, async ({ payload }) => {
     try {
-      const data = await gitlabServices.getDirectory(projectId, path, ref);
+      const data = await gitlabServices.getDirectory(payload.projectId, payload.path, payload.ref);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITLAB.FILE.CREATE_FILE, async ({ projectId, filePath, branch, content, commitMessage }) => {
+  registerTool(server, GITLAB.FILE.CREATE_FILE, async ({ payload }) => {
     try {
-      const data = await gitlabServices.createFile(projectId, filePath, branch, content, commitMessage);
+      const data = await gitlabServices.createFile(payload.projectId, payload.filePath, payload.branch, payload.content, payload.commitMessage);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITLAB.FILE.UPDATE_FILE, async ({ projectId, filePath, branch, content, commitMessage }) => {
+  registerTool(server, GITLAB.FILE.UPDATE_FILE, async ({ payload }) => {
     try {
-      const data = await gitlabServices.updateFile(projectId, filePath, branch, content, commitMessage);
+      const data = await gitlabServices.updateFile(payload.projectId, payload.filePath, payload.branch, payload.content, payload.commitMessage);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -228,45 +228,45 @@ function registerGitLabTools(server) {
 
   // ===== ISSUE OPERATIONS =====
   
-  registerTool(server, GITLAB.ISSUE.LIST_ISSUES, async ({ projectId, state }) => {
+  registerTool(server, GITLAB.ISSUE.LIST_ISSUES, async ({ payload }) => {
     try {
-      const data = await gitlabServices.listIssues(projectId, state);
+      const data = await gitlabServices.listIssues(payload.projectId, payload.state);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITLAB.ISSUE.GET_ISSUE, async ({ projectId, issueIid }) => {
+  registerTool(server, GITLAB.ISSUE.GET_ISSUE, async ({ payload }) => {
     try {
-      const data = await gitlabServices.getIssue(projectId, issueIid);
+      const data = await gitlabServices.getIssue(payload.projectId, payload.issueIid);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITLAB.ISSUE.CREATE_ISSUE, async ({ projectId, title, description }) => {
+  registerTool(server, GITLAB.ISSUE.CREATE_ISSUE, async ({ payload }) => {
     try {
-      const data = await gitlabServices.createIssue(projectId, title, description);
+      const data = await gitlabServices.createIssue(payload.projectId, payload.title, payload.description);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITLAB.ISSUE.UPDATE_ISSUE, async ({ projectId, issueIid, title, description, stateEvent }) => {
+  registerTool(server, GITLAB.ISSUE.UPDATE_ISSUE, async ({ payload }) => {
     try {
-      const data = await gitlabServices.updateIssue(projectId, issueIid, title, description, stateEvent);
+      const data = await gitlabServices.updateIssue(payload.projectId, payload.issueIid, payload.title, payload.description, payload.stateEvent);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITLAB.ISSUE.LIST_ISSUE_COMMENTS, async ({ projectId, issueIid }) => {
+  registerTool(server, GITLAB.ISSUE.LIST_ISSUE_COMMENTS, async ({ payload }) => {
     try {
-      const data = await gitlabServices.listIssueComments(projectId, issueIid);
+      const data = await gitlabServices.listIssueComments(payload.projectId, payload.issueIid);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -275,18 +275,18 @@ function registerGitLabTools(server) {
 
   // ===== SEARCH OPERATIONS =====
   
-  registerTool(server, GITLAB.SEARCH.SEARCH_CODE, async ({ searchQuery, projectId }) => {
+  registerTool(server, GITLAB.SEARCH.SEARCH_CODE, async ({ payload }) => {
     try {
-      const data = await gitlabServices.searchCode(searchQuery, projectId);
+      const data = await gitlabServices.searchCode(payload.searchQuery, payload.projectId);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITLAB.SEARCH.SEARCH_PROJECTS, async ({ searchQuery }) => {
+  registerTool(server, GITLAB.SEARCH.SEARCH_PROJECTS, async ({ payload }) => {
     try {
-      const data = await gitlabServices.searchProjects(searchQuery);
+      const data = await gitlabServices.searchProjects(payload.searchQuery);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);

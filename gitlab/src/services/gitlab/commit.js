@@ -6,53 +6,53 @@ import gitlab from '../gitlab-client.js';
 /**
  * List commits
  */
-async function listCommits(projectId, refName = null) {
+async function listCommits(playload) {
   try {
-    const encodedId = encodeURIComponent(projectId);
-    const params = refName ? { ref_name: refName } : {};
+    const encodedId = encodeURIComponent(playload.projectId);
+    const params = playload.refName ? { ref_name: playload.refName } : {};
     const res = await gitlab.get(`/projects/${encodedId}/repository/commits`, { params });
     return res.data;
   } catch (error) {
-    throw new Error(`Failed to list commits for project ${projectId}: ${error.message}`);
+    throw new Error(`Failed to list commits for project ${playload.projectId}: ${error.message}`);
   }
 }
 
 /**
  * Get commit details
  */
-async function getCommit(projectId, sha) {
+async function getCommit(playload) {
   try {
-    const encodedId = encodeURIComponent(projectId);
-    const res = await gitlab.get(`/projects/${encodedId}/repository/commits/${sha}`);
+    const encodedId = encodeURIComponent(playload.projectId);
+    const res = await gitlab.get(`/projects/${encodedId}/repository/commits/${playload.sha}`);
     return res.data;
   } catch (error) {
-    throw new Error(`Failed to get commit ${sha} for project ${projectId}: ${error.message}`);
+    throw new Error(`Failed to get commit ${playload.sha} for project ${playload.projectId}: ${error.message}`);
   }
 }
 
 /**
  * Get commit diff
  */
-async function getCommitDiff(projectId, sha) {
+async function getCommitDiff(playload) {
   try {
-    const encodedId = encodeURIComponent(projectId);
-    const res = await gitlab.get(`/projects/${encodedId}/repository/commits/${sha}/diff`);
+    const encodedId = encodeURIComponent(playload.projectId);
+    const res = await gitlab.get(`/projects/${encodedId}/repository/commits/${playload.sha}/diff`);
     return res.data;
   } catch (error) {
-    throw new Error(`Failed to get diff for commit ${sha}: ${error.message}`);
+    throw new Error(`Failed to get diff for commit ${playload.sha}: ${error.message}`);
   }
 }
 
 /**
  * List commit comments
  */
-async function listCommitComments(projectId, sha) {
+async function listCommitComments(playload) {
   try {
-    const encodedId = encodeURIComponent(projectId);
-    const res = await gitlab.get(`/projects/${encodedId}/repository/commits/${sha}/comments`);
+    const encodedId = encodeURIComponent(playload.projectId);
+    const res = await gitlab.get(`/projects/${encodedId}/repository/commits/${playload.sha}/comments`);
     return res.data;
   } catch (error) {
-    throw new Error(`Failed to list comments for commit ${sha}: ${error.message}`);
+    throw new Error(`Failed to list comments for commit ${playload.sha}: ${error.message}`);
   }
 }
 

@@ -30,7 +30,7 @@ function registerTool(server, toolDef, handler) {
 function registerGitHubTools(server) {
   // ===== REPOSITORY OPERATIONS =====
   
-  registerTool(server, GITHUB.REPOSITORY.GET_MY_REPOSITORIES, async () => {
+  registerTool(server, GITHUB.REPOSITORY.GET_MY_REPOSITORIES, async ({ payload }) => {
     try {
       const data = await githubServices.getMyRepos();
       return formatSuccess(data);
@@ -39,36 +39,36 @@ function registerGitHubTools(server) {
     }
   });
 
-  registerTool(server, GITHUB.REPOSITORY.GET_REPO_DETAILS, async ({ owner, repo }) => {
+  registerTool(server, GITHUB.REPOSITORY.GET_REPO_DETAILS, async ({ payload }) => {
     try {
-      const data = await githubServices.getRepo(owner, repo);
+      const data = await githubServices.getRepo(payload.owner, payload.repo);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.REPOSITORY.LIST_REPO_FORKS, async ({ owner, repo }) => {
+  registerTool(server, GITHUB.REPOSITORY.LIST_REPO_FORKS, async ({ payload }) => {
     try {
-      const data = await githubServices.listForks(owner, repo);
+      const data = await githubServices.listForks(payload.owner, payload.repo);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.REPOSITORY.GET_REPO_TOPICS, async ({ owner, repo }) => {
+  registerTool(server, GITHUB.REPOSITORY.GET_REPO_TOPICS, async ({ payload }) => {
     try {
-      const data = await githubServices.getRepoTopics(owner, repo);
+      const data = await githubServices.getRepoTopics(payload.owner, payload.repo);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.REPOSITORY.CREATE_REPO, async ({ name, description, isPrivate, autoInit }) => {
+  registerTool(server, GITHUB.REPOSITORY.CREATE_REPO, async ({ payload }) => {
     try {
-      const data = await githubServices.createRepo(name, description, isPrivate, autoInit);
+      const data = await githubServices.createRepo(payload.name, payload.description, payload.isPrivate, payload.autoInit);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -77,27 +77,27 @@ function registerGitHubTools(server) {
 
   // ===== ISSUE OPERATIONS =====
   
-  registerTool(server, GITHUB.ISSUE.LIST_REPO_ISSUES, async ({ owner, repo, state }) => {
+  registerTool(server, GITHUB.ISSUE.LIST_REPO_ISSUES, async ({ payload }) => {
     try {
-      const data = await githubServices.listIssues(owner, repo, state);
+      const data = await githubServices.listIssues(payload.owner, payload.repo, payload.state);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.ISSUE.GET_ISSUE, async ({ owner, repo, issueNumber }) => {
+  registerTool(server, GITHUB.ISSUE.GET_ISSUE, async ({ payload }) => {
     try {
-      const data = await githubServices.getIssue(owner, repo, issueNumber);
+      const data = await githubServices.getIssue(payload.owner, payload.repo, payload.issueNumber);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.ISSUE.LIST_ISSUE_COMMENTS, async ({ owner, repo, issueNumber }) => {
+  registerTool(server, GITHUB.ISSUE.LIST_ISSUE_COMMENTS, async ({ payload }) => {
     try {
-      const data = await githubServices.listIssueComments(owner, repo, issueNumber);
+      const data = await githubServices.listIssueComments(payload.owner, payload.repo, payload.issueNumber);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -106,45 +106,45 @@ function registerGitHubTools(server) {
 
   // ===== PULL REQUEST OPERATIONS =====
   
-  registerTool(server, GITHUB.PULL_REQUEST.LIST_PULL_REQUESTS, async ({ owner, repo, state }) => {
+  registerTool(server, GITHUB.PULL_REQUEST.LIST_PULL_REQUESTS, async ({ payload }) => {
     try {
-      const data = await githubServices.listPullRequests(owner, repo, state);
+      const data = await githubServices.listPullRequests(payload.owner, payload.repo, payload.state);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.PULL_REQUEST.GET_PULL_REQUEST, async ({ owner, repo, prNumber }) => {
+  registerTool(server, GITHUB.PULL_REQUEST.GET_PULL_REQUEST, async ({ payload }) => {
     try {
-      const data = await githubServices.getPullRequest(owner, repo, prNumber);
+      const data = await githubServices.getPullRequest(payload.owner, payload.repo, payload.prNumber);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.PULL_REQUEST.LIST_PR_REVIEWS, async ({ owner, repo, prNumber }) => {
+  registerTool(server, GITHUB.PULL_REQUEST.LIST_PR_REVIEWS, async ({ payload }) => {
     try {
-      const data = await githubServices.listPRReviews(owner, repo, prNumber);
+      const data = await githubServices.listPRReviews(payload.owner, payload.repo, payload.prNumber);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.PULL_REQUEST.LIST_PR_FILES, async ({ owner, repo, prNumber }) => {
+  registerTool(server, GITHUB.PULL_REQUEST.LIST_PR_FILES, async ({ payload }) => {
     try {
-      const data = await githubServices.listPRFiles(owner, repo, prNumber);
+      const data = await githubServices.listPRFiles(payload.owner, payload.repo, payload.prNumber);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.PULL_REQUEST.LIST_PR_COMMENTS, async ({ owner, repo, prNumber }) => {
+  registerTool(server, GITHUB.PULL_REQUEST.LIST_PR_COMMENTS, async ({ payload }) => {
     try {
-      const data = await githubServices.listPRComments(owner, repo, prNumber);
+      const data = await githubServices.listPRComments(payload.owner, payload.repo, payload.prNumber);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -153,45 +153,45 @@ function registerGitHubTools(server) {
 
   // ===== BRANCH OPERATIONS =====
   
-  registerTool(server, GITHUB.BRANCH.LIST_BRANCHES, async ({ owner, repo }) => {
+  registerTool(server, GITHUB.BRANCH.LIST_BRANCHES, async ({ payload }) => {
     try {
-      const data = await githubServices.listBranches(owner, repo);
+      const data = await githubServices.listBranches(payload.owner, payload.repo);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.BRANCH.GET_BRANCH, async ({ owner, repo, branch }) => {
+  registerTool(server, GITHUB.BRANCH.GET_BRANCH, async ({ payload }) => {
     try {
-      const data = await githubServices.getBranch(owner, repo, branch);
+      const data = await githubServices.getBranch(payload.owner, payload.repo, payload.branch);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.BRANCH.CREATE_BRANCH, async ({ owner, repo, newBranch, fromSha }) => {
+  registerTool(server, GITHUB.BRANCH.CREATE_BRANCH, async ({ payload }) => {
     try {
-      const data = await githubServices.createBranch(owner, repo, newBranch, fromSha);
+      const data = await githubServices.createBranch(payload.owner, payload.repo, payload.newBranch, payload.fromSha);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.BRANCH.DELETE_BRANCH, async ({ owner, repo, branch }) => {
+  registerTool(server, GITHUB.BRANCH.DELETE_BRANCH, async ({ payload }) => {
     try {
-      const data = await githubServices.deleteBranch(owner, repo, branch);
+      const data = await githubServices.deleteBranch(payload.owner, payload.repo, payload.branch);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.BRANCH.GET_DEFAULT_BRANCH, async ({ owner, repo }) => {
+  registerTool(server, GITHUB.BRANCH.GET_DEFAULT_BRANCH, async ({ payload }) => {
     try {
-      const data = await githubServices.getDefaultBranch(owner, repo);
+      const data = await githubServices.getDefaultBranch(payload.owner, payload.repo);
       return formatText(data);
     } catch (error) {
       return formatError(error);
@@ -200,27 +200,27 @@ function registerGitHubTools(server) {
 
   // ===== COMMIT OPERATIONS =====
   
-  registerTool(server, GITHUB.COMMIT.LIST_COMMITS, async ({ owner, repo, sha, path }) => {
+  registerTool(server, GITHUB.COMMIT.LIST_COMMITS, async ({ payload }) => {
     try {
-      const data = await githubServices.listCommits(owner, repo, sha, path);
+      const data = await githubServices.listCommits(payload.owner, payload.repo, payload.sha, payload.path);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.COMMIT.GET_COMMIT, async ({ owner, repo, sha }) => {
+  registerTool(server, GITHUB.COMMIT.GET_COMMIT, async ({ payload }) => {
     try {
-      const data = await githubServices.getCommit(owner, repo, sha);
+      const data = await githubServices.getCommit(payload.owner, payload.repo, payload.sha);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.COMMIT.COMPARE_COMMITS, async ({ owner, repo, base, head }) => {
+  registerTool(server, GITHUB.COMMIT.COMPARE_COMMITS, async ({ payload }) => {
     try {
-      const data = await githubServices.compareCommits(owner, repo, base, head);
+      const data = await githubServices.compareCommits(payload.owner, payload.repo, payload.base, payload.head);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -229,36 +229,36 @@ function registerGitHubTools(server) {
 
   // ===== FILE OPERATIONS =====
   
-  registerTool(server, GITHUB.FILE.GET_FILE_CONTENTS, async ({ owner, repo, path, ref }) => {
+  registerTool(server, GITHUB.FILE.GET_FILE_CONTENTS, async ({ payload }) => {
     try {
-      const data = await githubServices.getFileContents(owner, repo, path, ref);
+      const data = await githubServices.getFileContents(payload.owner, payload.repo, payload.path, payload.ref);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.FILE.CREATE_OR_UPDATE_FILE, async ({ owner, repo, path, message, content, sha, branch }) => {
+  registerTool(server, GITHUB.FILE.CREATE_OR_UPDATE_FILE, async ({ payload }) => {
     try {
-      const data = await githubServices.createOrUpdateFile(owner, repo, path, message, content, sha, branch);
+      const data = await githubServices.createOrUpdateFile(payload.owner, payload.repo, payload.path, payload.message, payload.content, payload.sha, payload.branch);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.FILE.DELETE_FILE, async ({ owner, repo, path, message, sha, branch }) => {
+  registerTool(server, GITHUB.FILE.DELETE_FILE, async ({ payload }) => {
     try {
-      const data = await githubServices.deleteFile(owner, repo, path, message, sha, branch);
+      const data = await githubServices.deleteFile(payload.owner, payload.repo, payload.path, payload.message, payload.sha, payload.branch);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.FILE.GET_DIRECTORY_CONTENTS, async ({ owner, repo, path, ref }) => {
+  registerTool(server, GITHUB.FILE.GET_DIRECTORY_CONTENTS, async ({ payload }) => {
     try {
-      const data = await githubServices.getDirectoryContents(owner, repo, path, ref);
+      const data = await githubServices.getDirectoryContents(payload.owner, payload.repo, payload.path, payload.ref);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -267,9 +267,9 @@ function registerGitHubTools(server) {
 
   // ===== TREE OPERATIONS =====
   
-  registerTool(server, GITHUB.TREE.GET_TREE, async ({ owner, repo, treeSha, recursive }) => {
+  registerTool(server, GITHUB.TREE.GET_TREE, async ({ payload }) => {
     try {
-      const data = await githubServices.getTree(owner, repo, treeSha, recursive);
+      const data = await githubServices.getTree(payload.owner, payload.repo, payload.treeSha, payload.recursive);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -278,18 +278,18 @@ function registerGitHubTools(server) {
 
   // ===== BLOB OPERATIONS =====
   
-  registerTool(server, GITHUB.BLOB.GET_BLOB, async ({ owner, repo, fileSha }) => {
+  registerTool(server, GITHUB.BLOB.GET_BLOB, async ({ payload }) => {
     try {
-      const data = await githubServices.getBlob(owner, repo, fileSha);
+      const data = await githubServices.getBlob(payload.owner, payload.repo, payload.fileSha);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.BLOB.CREATE_BLOB, async ({ owner, repo, content, encoding }) => {
+  registerTool(server, GITHUB.BLOB.CREATE_BLOB, async ({ payload }) => {
     try {
-      const data = await githubServices.createBlob(owner, repo, content, encoding);
+      const data = await githubServices.createBlob(payload.owner, payload.repo, payload.content, payload.encoding);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -298,18 +298,18 @@ function registerGitHubTools(server) {
 
   // ===== REPOSITORY ADVISORIES =====
   
-  registerTool(server, GITHUB.REPOSITORY.LIST_REPOSITORY_ADVISORIES, async ({ owner, repo }) => {
+  registerTool(server, GITHUB.REPOSITORY.LIST_REPOSITORY_ADVISORIES, async ({ payload }) => {
     try {
-      const data = await githubServices.listRepositoryAdvisories(owner, repo);
+      const data = await githubServices.listRepositoryAdvisories(payload.owner, payload.repo);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.REPOSITORY.GET_REPOSITORY_ADVISORY, async ({ owner, repo, ghsaId }) => {
+  registerTool(server, GITHUB.REPOSITORY.GET_REPOSITORY_ADVISORY, async ({ payload }) => {
     try {
-      const data = await githubServices.getRepositoryAdvisory(owner, repo, ghsaId);
+      const data = await githubServices.getRepositoryAdvisory(payload.owner, payload.repo, payload.ghsaId);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -318,36 +318,36 @@ function registerGitHubTools(server) {
 
   // ===== SEARCH OPERATIONS =====
   
-  registerTool(server, GITHUB.SEARCH.SEARCH_REPOSITORIES, async ({ query, sort, order }) => {
+  registerTool(server, GITHUB.SEARCH.SEARCH_REPOSITORIES, async ({ payload }) => {
     try {
-      const data = await githubServices.searchRepositories(query, sort, order);
+      const data = await githubServices.searchRepositories(payload.query, payload.sort, payload.order);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.SEARCH.SEARCH_CODE, async ({ query, sort, order }) => {
+  registerTool(server, GITHUB.SEARCH.SEARCH_CODE, async ({ payload }) => {
     try {
-      const data = await githubServices.searchCode(query, sort, order);
+      const data = await githubServices.searchCode(payload.query, payload.sort, payload.order);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.SEARCH.SEARCH_ISSUES, async ({ query, sort, order }) => {
+  registerTool(server, GITHUB.SEARCH.SEARCH_ISSUES, async ({ payload }) => {
     try {
-      const data = await githubServices.searchIssues(query, sort, order);
+      const data = await githubServices.searchIssues(payload.query, payload.sort, payload.order);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.SEARCH.SEARCH_COMMITS, async ({ query, sort, order }) => {
+  registerTool(server, GITHUB.SEARCH.SEARCH_COMMITS, async ({ payload }) => {
     try {
-      const data = await githubServices.searchCommits(query, sort, order);
+      const data = await githubServices.searchCommits(payload.query, payload.sort, payload.order);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -356,9 +356,9 @@ function registerGitHubTools(server) {
 
   // ===== TAGS OPERATIONS =====
   
-  registerTool(server, GITHUB.REPOSITORY.LIST_TAGS, async ({ owner, repo }) => {
+  registerTool(server, GITHUB.REPOSITORY.LIST_TAGS, async ({ payload }) => {
     try {
-      const data = await githubServices.listTags(owner, repo);
+      const data = await githubServices.listTags(payload.owner, payload.repo);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -367,18 +367,18 @@ function registerGitHubTools(server) {
 
   // ===== DIFF OPERATIONS =====
   
-  registerTool(server, GITHUB.PULL_REQUEST.GET_PULL_REQUEST_DIFF, async ({ owner, repo, prNumber }) => {
+  registerTool(server, GITHUB.PULL_REQUEST.GET_PULL_REQUEST_DIFF, async ({ payload }) => {
     try {
-      const data = await githubServices.getPullRequestDiff(owner, repo, prNumber);
+      const data = await githubServices.getPullRequestDiff(payload.owner, payload.repo, payload.prNumber);
       return formatText(data);
     } catch (error) {
       return formatError(error);
     }
   });
 
-  registerTool(server, GITHUB.COMMIT.GET_COMMIT_DIFF, async ({ owner, repo, sha }) => {
+  registerTool(server, GITHUB.COMMIT.GET_COMMIT_DIFF, async ({ payload }) => {
     try {
-      const data = await githubServices.getCommitDiff(owner, repo, sha);
+      const data = await githubServices.getCommitDiff(payload.owner, payload.repo, payload.sha);
       return formatText(data);
     } catch (error) {
       return formatError(error);

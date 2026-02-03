@@ -6,14 +6,14 @@ import bitbucket from '../bitbucket-client.js';
 /**
  * Search code in workspace repositories
  */
-async function searchCode(workspace, searchQuery) {
+async function searchCode(payload) {
   try {
-    const res = await bitbucket.get(`/workspaces/${workspace}/search/code`, {
-      params: { search_query: searchQuery },
+    const res = await bitbucket.get(`/workspaces/${payload.workspace}/search/code`, {
+      params: { search_query: payload.searchQuery },
     });
     return res.data;
   } catch (error) {
-    throw new Error(`Failed to search code in workspace ${workspace}: ${error.message}`);
+    throw new Error(`Failed to search code in workspace ${payload.workspace}: ${error.message}`);
   }
 }
 

@@ -6,12 +6,12 @@ import gitlab from '../gitlab-client.js';
 /**
  * List all accessible projects
  */
-async function listProjects(membership = false, owned = false, starred = false) {
+async function listProjects(payload) {
   try {
     const params = {};
-    if (membership) params.membership = true;
-    if (owned) params.owned = true;
-    if (starred) params.starred = true;
+    if (payload.membership) params.membership = true;
+    if (payload.owned) params.owned = true;
+    if (payload.starred) params.starred = true;
     
     const res = await gitlab.get('/projects', { params });
     return res.data;
@@ -23,43 +23,43 @@ async function listProjects(membership = false, owned = false, starred = false) 
 /**
  * Get project details
  */
-async function getProject(projectId) {
+async function getProject(payload) {
   try {
-    const encodedId = encodeURIComponent(projectId);
+    const encodedId = encodeURIComponent(payload.projectId);
     const res = await gitlab.get(`/projects/${encodedId}`);
     return res.data;
   } catch (error) {
-    throw new Error(`Failed to get project ${projectId}: ${error.message}`);
+    throw new Error(`Failed to get project ${payload.projectId}: ${error.message}`);
   }
 }
 
 /**
  * Create a new project
  */
-async function createProject(name, description = '', visibility = 'private', initializeWithReadme = false) {
+async function createProject(payload) {
   try {
     const res = await gitlab.post('/projects', {
-      name,
-      description,
-      visibility,
-      initialize_with_readme: initializeWithReadme,
+      name: payload.name,
+      description: payload.description,
+      visibility: payload.visibility,
+      initialize_with_readme: payload.initializeWithReadme,
     });
     return res.data;
   } catch (error) {
-    throw new Error(`Failed to create project ${name}: ${error.message}`);
+    throw new Error(`Failed to create project ${payload.name}: ${error.message}`);
   }
 }
 
 /**
  * List project forks
  */
-async function listProjectForks(projectId) {
+async function listProjectForks(payload) {
   try {
-    const encodedId = encodeURIComponent(projectId);
+    const encodedId = encodeURIComponent(payload.projectId);
     const res = await gitlab.get(`/projects/${encodedId}/forks`);
     return res.data;
   } catch (error) {
-    throw new Error(`Failed to list forks for project ${projectId}: ${error.message}`);
+    throw new Error(`Failed to list forks for project ${payload.projectId}: ${error.message}`);
   }
 }
 

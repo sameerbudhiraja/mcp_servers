@@ -6,61 +6,61 @@ import github from '../github-client.js';
 /**
  * Get file contents
  */
-async function getFileContents(owner, repo, path, ref = '') {
+async function getFileContents(payload) {
   try {
-    const params = ref ? { ref } : {};
-    const res = await github.get(`/repos/${owner}/${repo}/contents/${path}`, { params });
+    const params = payload.ref ? { ref: payload.ref } : {};
+    const res = await github.get(`/repos/${payload.owner}/${payload.repo}/contents/${payload.path}`, { params });
     return res.data;
   } catch (error) {
-    throw new Error(`Failed to get file contents for ${owner}/${repo}/${path}: ${error.message}`);
+    throw new Error(`Failed to get file contents for ${payload.owner}/${payload.repo}/${payload.path}: ${error.message}`);
   }
 }
 
 /**
  * Create or update a file
  */
-async function createOrUpdateFile(owner, repo, path, message, content, sha = null, branch = '') {
+async function createOrUpdateFile(payload) {
   try {
     const data = {
-      message,
-      content, // Base64 encoded content
-      ...(sha && { sha }),
-      ...(branch && { branch }),
+      message: payload.message,
+      content: payload.content, // Base64 encoded content
+      ...(payload.sha && { sha: payload.sha }),
+      ...(payload.branch && { branch: payload.branch }),
     };
-    const res = await github.put(`/repos/${owner}/${repo}/contents/${path}`, data);
+    const res = await github.put(`/repos/${payload.owner}/${payload.repo}/contents/${payload.path}`, data);
     return res.data;
   } catch (error) {
-    throw new Error(`Failed to create/update file ${owner}/${repo}/${path}: ${error.message}`);
+    throw new Error(`Failed to create/update file ${payload.owner}/${payload.repo}/${payload.path}: ${error.message}`);
   }
 }
 
 /**
  * Delete a file
  */
-async function deleteFile(owner, repo, path, message, sha, branch = '') {
+async function deleteFile(payload) {
   try {
     const data = {
-      message,
-      sha,
-      ...(branch && { branch }),
+      message: payload.message,
+      sha: payload.sha,
+      ...(payload.branch && { branch: payload.branch }),
     };
-    const res = await github.delete(`/repos/${owner}/${repo}/contents/${path}`, { data });
+    const res = await github.delete(`/repos/${payload.owner}/${payload.repo}/contents/${payload.path}`, { data });
     return res.data;
   } catch (error) {
-    throw new Error(`Failed to delete file ${owner}/${repo}/${path}: ${error.message}`);
+    throw new Error(`Failed to delete file ${payload.owner}/${payload.repo}/${payload.path}: ${error.message}`);
   }
 }
 
 /**
  * Get directory contents
  */
-async function getDirectoryContents(owner, repo, path = '', ref = '') {
+async function getDirectoryContents(payload) {
   try {
-    const params = ref ? { ref } : {};
-    const res = await github.get(`/repos/${owner}/${repo}/contents/${path}`, { params });
+    const params = payload.ref ? { ref: payload.ref } : {};
+    const res = await github.get(`/repos/${payload.owner}/${payload.repo}/contents/${payload.path}`, { params });
     return res.data;
   } catch (error) {
-    throw new Error(`Failed to get directory contents for ${owner}/${repo}/${path}: ${error.message}`);
+    throw new Error(`Failed to get directory contents for ${payload.owner}/${payload.repo}/${payload.path}: ${error.message}`);
   }
 }
 

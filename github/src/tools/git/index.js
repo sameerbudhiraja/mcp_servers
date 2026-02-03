@@ -29,9 +29,9 @@ function registerTool(server, toolDef, handler) {
  */
 function registerGitTools(server) {
   // Git Init
-  registerTool(server, GIT_TOOLS.INIT, async ({ repoPath }) => {
+  registerTool(server, GIT_TOOLS.INIT, async ({ payload }) => {
     try {
-      const data = await gitService.gitInit(repoPath);
+      const data = await gitService.gitInit(payload.repoPath);
       return formatText(data);
     } catch (error) {
       return formatError(error);
@@ -39,9 +39,9 @@ function registerGitTools(server) {
   });
 
   // Git Status
-  registerTool(server, GIT_TOOLS.STATUS, async ({ repoPath }) => {
+  registerTool(server, GIT_TOOLS.STATUS, async ({ payload }) => {
     try {
-      const data = await gitService.gitStatus(repoPath);
+      const data = await gitService.gitStatus(payload.repoPath);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -49,9 +49,9 @@ function registerGitTools(server) {
   });
 
   // Git Add
-  registerTool(server, GIT_TOOLS.ADD, async ({ repoPath, files }) => {
+  registerTool(server, GIT_TOOLS.ADD, async ({ payload }) => {
     try {
-      const data = await gitService.gitAdd(repoPath, files);
+      const data = await gitService.gitAdd(payload.repoPath, payload.files);
       return formatText(data);
     } catch (error) {
       return formatError(error);
@@ -59,9 +59,9 @@ function registerGitTools(server) {
   });
 
   // Git Commit
-  registerTool(server, GIT_TOOLS.COMMIT, async ({ repoPath, message }) => {
+  registerTool(server, GIT_TOOLS.COMMIT, async ({ payload }) => {
     try {
-      const data = await gitService.gitCommit(repoPath, message);
+      const data = await gitService.gitCommit(payload.repoPath, payload.message);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -69,9 +69,9 @@ function registerGitTools(server) {
   });
 
   // Git Push
-  registerTool(server, GIT_TOOLS.PUSH, async ({ repoPath, remote, branch, setUpstream }) => {
+  registerTool(server, GIT_TOOLS.PUSH, async ({ payload }) => {
     try {
-      const data = await gitService.gitPush(repoPath, remote, branch, setUpstream);
+      const data = await gitService.gitPush(payload.repoPath, payload.remote, payload.branch, payload.setUpstream);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -79,9 +79,9 @@ function registerGitTools(server) {
   });
 
   // Git Pull
-  registerTool(server, GIT_TOOLS.PULL, async ({ repoPath, remote, branch }) => {
+  registerTool(server, GIT_TOOLS.PULL, async ({ payload }) => {
     try {
-      const data = await gitService.gitPull(repoPath, remote, branch);
+      const data = await gitService.gitPull(payload.repoPath, payload.remote, payload.branch);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -89,9 +89,9 @@ function registerGitTools(server) {
   });
 
   // Git Clone
-  registerTool(server, GIT_TOOLS.CLONE, async ({ url, targetPath }) => {
+  registerTool(server, GIT_TOOLS.CLONE, async ({ payload }) => {
     try {
-      const data = await gitService.gitClone(url, targetPath);
+      const data = await gitService.gitClone(payload.url, payload.targetPath);
       return formatText(data);
     } catch (error) {
       return formatError(error);
@@ -99,9 +99,9 @@ function registerGitTools(server) {
   });
 
   // Git Remote Add
-  registerTool(server, GIT_TOOLS.REMOTE_ADD, async ({ repoPath, name, url }) => {
+  registerTool(server, GIT_TOOLS.REMOTE_ADD, async ({ payload }) => {
     try {
-      const data = await gitService.gitRemoteAdd(repoPath, name, url);
+      const data = await gitService.gitRemoteAdd(payload.repoPath, payload.name, payload.url);
       return formatText(data);
     } catch (error) {
       return formatError(error);
@@ -109,9 +109,9 @@ function registerGitTools(server) {
   });
 
   // Git Remote List
-  registerTool(server, GIT_TOOLS.REMOTE_LIST, async ({ repoPath }) => {
+  registerTool(server, GIT_TOOLS.REMOTE_LIST, async ({ payload }) => {
     try {
-      const data = await gitService.gitRemoteList(repoPath);
+      const data = await gitService.gitRemoteList(payload.repoPath);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -119,9 +119,9 @@ function registerGitTools(server) {
   });
 
   // Git Remote Remove
-  registerTool(server, GIT_TOOLS.REMOTE_REMOVE, async ({ repoPath, name }) => {
+  registerTool(server, GIT_TOOLS.REMOTE_REMOVE, async ({ payload }) => {
     try {
-      const data = await gitService.gitRemoteRemove(repoPath, name);
+      const data = await gitService.gitRemoteRemove(payload.repoPath, payload.name);
       return formatText(data);
     } catch (error) {
       return formatError(error);
@@ -129,9 +129,9 @@ function registerGitTools(server) {
   });
 
   // Git Log
-  registerTool(server, GIT_TOOLS.LOG, async ({ repoPath, maxCount }) => {
+  registerTool(server, GIT_TOOLS.LOG, async ({ payload }) => {
     try {
-      const data = await gitService.gitLog(repoPath, maxCount);
+      const data = await gitService.gitLog(payload.repoPath, payload.maxCount);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -139,9 +139,9 @@ function registerGitTools(server) {
   });
 
   // Git Diff
-  registerTool(server, GIT_TOOLS.DIFF, async ({ repoPath, options }) => {
+  registerTool(server, GIT_TOOLS.DIFF, async ({ payload }) => {
     try {
-      const data = await gitService.gitDiff(repoPath, options);
+      const data = await gitService.gitDiff(payload.repoPath, payload.options);
       return formatText(data);
     } catch (error) {
       return formatError(error);
@@ -149,9 +149,9 @@ function registerGitTools(server) {
   });
 
   // Git Reset
-  registerTool(server, GIT_TOOLS.RESET, async ({ repoPath, mode, commit }) => {
+  registerTool(server, GIT_TOOLS.RESET, async ({ payload }) => {
     try {
-      const data = await gitService.gitReset(repoPath, mode, commit);
+      const data = await gitService.gitReset(payload.repoPath, payload.mode, payload.commit);
       return formatText(data);
     } catch (error) {
       return formatError(error);
@@ -159,9 +159,9 @@ function registerGitTools(server) {
   });
 
   // Git Checkout
-  registerTool(server, GIT_TOOLS.CHECKOUT, async ({ repoPath, branch, createNew }) => {
+  registerTool(server, GIT_TOOLS.CHECKOUT, async ({ payload }) => {
     try {
-      const data = await gitService.gitCheckout(repoPath, branch, createNew);
+      const data = await gitService.gitCheckout(payload.repoPath, payload.branch, payload.createNew);
       return formatText(data);
     } catch (error) {
       return formatError(error);
@@ -169,9 +169,9 @@ function registerGitTools(server) {
   });
 
   // Git Branch List
-  registerTool(server, GIT_TOOLS.BRANCH_LIST, async ({ repoPath }) => {
+  registerTool(server, GIT_TOOLS.BRANCH_LIST, async ({ payload }) => {
     try {
-      const data = await gitService.gitBranchList(repoPath);
+      const data = await gitService.gitBranchList(payload.repoPath);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -179,9 +179,9 @@ function registerGitTools(server) {
   });
 
   // Git Branch Delete
-  registerTool(server, GIT_TOOLS.BRANCH_DELETE, async ({ repoPath, branch, force }) => {
+  registerTool(server, GIT_TOOLS.BRANCH_DELETE, async ({ payload }) => {
     try {
-      const data = await gitService.gitBranchDelete(repoPath, branch, force);
+      const data = await gitService.gitBranchDelete(payload.repoPath, payload.branch, payload.force);
       return formatText(data);
     } catch (error) {
       return formatError(error);
@@ -189,9 +189,9 @@ function registerGitTools(server) {
   });
 
   // Git Stash
-  registerTool(server, GIT_TOOLS.STASH, async ({ repoPath, action }) => {
+  registerTool(server, GIT_TOOLS.STASH, async ({ payload }) => {
     try {
-      const data = await gitService.gitStash(repoPath, action);
+      const data = await gitService.gitStash(payload.repoPath, payload.action);
       return typeof data === 'string' ? formatText(data) : formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -199,9 +199,9 @@ function registerGitTools(server) {
   });
 
   // Git Tag
-  registerTool(server, GIT_TOOLS.TAG, async ({ repoPath, tagName, message }) => {
+  registerTool(server, GIT_TOOLS.TAG, async ({ payload }) => {
     try {
-      const data = await gitService.gitTag(repoPath, tagName, message);
+      const data = await gitService.gitTag(payload.repoPath, payload.tagName, payload.message);
       return formatText(data);
     } catch (error) {
       return formatError(error);
@@ -209,9 +209,9 @@ function registerGitTools(server) {
   });
 
   // Git Fetch
-  registerTool(server, GIT_TOOLS.FETCH, async ({ repoPath, remote }) => {
+  registerTool(server, GIT_TOOLS.FETCH, async ({ payload }) => {
     try {
-      const data = await gitService.gitFetch(repoPath, remote);
+      const data = await gitService.gitFetch(payload.repoPath, payload.remote);
       return formatSuccess(data);
     } catch (error) {
       return formatError(error);
@@ -219,9 +219,9 @@ function registerGitTools(server) {
   });
 
   // Git Merge
-  registerTool(server, GIT_TOOLS.MERGE, async (request) => {
+  registerTool(server, GIT_TOOLS.MERGE, async ({ payload }) => {
     try {
-      const data = await gitService.gitMerge(request.repoPath, request.branch);
+      const data = await gitService.gitMerge(payload.repoPath, payload.branch);
       
       return formatSuccess(data);
     } catch (error) {
