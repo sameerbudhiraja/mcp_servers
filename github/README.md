@@ -263,4 +263,58 @@ LOG_FILE_ENABLED=true|false
 
 ---
 
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Authentication Errors**
+- Verify your GitHub Personal Access Token is valid
+- Check token has required scopes (see Token Permissions section)
+- Ensure token hasn't expired
+
+**Git CLI Commands Failing**
+- Verify Git is installed: `git --version`
+- Check repository paths are correct and accessible
+- Ensure you have file system permissions
+
+**Rate Limiting**
+- GitHub API has rate limits (5000/hour authenticated)
+- Use pagination and reduce concurrent requests
+- Check response headers for rate limit info
+
+**Connection Timeouts**
+- Default timeout is 30000ms
+- Increase via: `GIT_TIMEOUT=60000` in `.env`
+- Check network connectivity to GitHub
+
+**Tool Not Found**
+- Verify the tool name matches documentation exactly
+- Check that the MCP server started successfully
+- Review logs in `logs/` directory for errors
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! To contribute:
+
+1. Follow the existing layered architecture
+2. Add endpoints to `src/constants/endpoints.js`
+3. Define schemas in `src/constants/tool-schemas.js`
+4. Implement service functions in `src/services/github/*.js` or `src/services/git/index.js`
+5. Register tools in `src/tools/github/index.js` or `src/tools/git/index.js`
+6. Update documentation for new tools
+7. Run linting: `npm run lint` (if configured)
+8. Test thoroughly before submitting
+
+---
+
+## 🔗 Related Documentation
+
+- [Main MCP Servers README](../README.md)
+- [GitHub REST API Documentation](https://docs.github.com/en/rest)
+- [simple-git Documentation](https://github.com/steveukx/git-js)
+
+---
+
 *Built with ❤️*

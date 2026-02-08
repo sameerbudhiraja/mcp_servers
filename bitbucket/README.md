@@ -179,6 +179,62 @@ All API calls and operations are wrapped in try-catch blocks with:
 3. Create service function in appropriate `src/services/bitbucket/*.js` file
 4. Register tool in `src/tools/bitbucket/index.js`
 
+---
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Authentication Failures**
+- Verify your API token is correct and not expired
+- Ensure `BITBUCKET_EMAIL` matches your Bitbucket account email
+- Check that you're using an API token, not an app password (deprecated)
+- Confirm your account has necessary permissions
+
+**Workspace Not Found**
+- Verify `BITBUCKET_WORKSPACE` slug is correct
+- Check that you're a member of the workspace
+- Ensure the workspace exists and is accessible
+
+**Repository Access Errors**
+- Confirm you have read/write access to the repository
+- Check repository names are correct (case-sensitive)
+- Verify the repository exists in the specified workspace
+
+**Connection Timeouts**
+- Default timeout is 30000ms (30 seconds)
+- Increase via: `BITBUCKET_TIMEOUT=60000` in `.env`
+- Check network connectivity to Bitbucket Cloud
+
+**Rate Limiting**
+- Bitbucket has API rate limits
+- Reduce concurrent requests if hitting limits
+- Implement exponential backoff for retries
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! To contribute:
+
+1. Follow the existing architecture patterns
+2. Add endpoints to `src/constants/endpoints.js`
+3. Define schemas in `src/constants/tool-schemas.js`
+4. Implement service functions in `src/services/bitbucket/*.js`
+5. Register tools in `src/tools/bitbucket/index.js`
+6. Update documentation for new tools
+7. Test thoroughly before submitting
+
+---
+
+## 🔗 Related Documentation
+
+- [Main MCP Servers README](../README.md)
+- [Bitbucket Cloud REST API Documentation](https://developer.atlassian.com/cloud/bitbucket/rest/)
+- [Bitbucket API Tokens Guide](https://support.atlassian.com/bitbucket-cloud/docs/api-tokens/)
+
+---
+
 ## License
 
 ISC

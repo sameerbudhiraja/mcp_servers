@@ -171,6 +171,8 @@ The server provides 31 tools across 9 categories:
 - `jira_get_filters` - Get saved filters
 - `jira_search_by_filter` - Search using saved filter
 
+> 📚 **See [JIRA_TOOLS_REFERENCE.md](./JIRA_TOOLS_REFERENCE.md) for detailed tool documentation**
+
 ## Authentication
 
 The server uses **API Token** authentication with **Basic HTTP Auth**:
@@ -218,6 +220,61 @@ npm run lint
 ```bash
 npm run lint:fix
 ```
+
+---
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Authentication Failures**
+- Verify your API token is correct and not expired
+- Ensure `JIRA_EMAIL` matches your Atlassian account email
+- Check that `JIRA_BASE_URL` includes your correct domain
+- Confirm your account has necessary permissions
+
+**Tool Not Found Errors**
+- Check that the issue key/ID exists and you have access
+- Verify project keys are correct (case-sensitive)
+- Ensure you have browse permission for the project
+
+**Permission Denied**
+- Review your Jira permissions for the specific action
+- Some operations require admin or project admin rights
+- Check if your API token has the required scopes
+
+**Connection Timeouts**
+- Default timeout is 30000ms (30 seconds)
+- Increase via: `JIRA_TIMEOUT=60000` in `.env`
+- Check if your Jira instance is accessible
+
+**JQL Search Errors**
+- Validate JQL syntax using Jira's search interface first
+- Field names are case-sensitive
+- Use quotes for multi-word values: `status = "In Progress"`
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! To contribute:
+
+1. Follow the existing architecture patterns
+2. Add tool schemas to `src/constants/tool-schemas.js`
+3. Implement service functions in `src/services/jira/*.js`
+4. Register tools in `src/tools/jira/index.js`
+5. Update documentation for new tools
+6. Test thoroughly before submitting
+
+---
+
+## 🔗 Related Documentation
+
+- [Main MCP Servers README](../README.md)
+- [Jira Cloud REST API Documentation](https://developer.atlassian.com/cloud/jira/platform/rest/v3/)
+- [Jira Agile REST API](https://developer.atlassian.com/cloud/jira/software/rest/)
+
+---
 
 ## License
 
