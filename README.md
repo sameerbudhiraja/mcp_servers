@@ -4,7 +4,7 @@ A comprehensive collection of Model Context Protocol (MCP) servers for popular d
 
 ## 🎬 Demo
 
-[![Watch the demo](https://img.youtube.com/vi/TYS4y-TeAv8/maxresdefault.jpg)](https://youtu.be/TYS4y-TeAv8)
+[![Watch the demo](https://img.youtube.com/vi/TYS4y-TeAv8/0.jpg)](https://youtu.be/TYS4y-TeAv8)
 
 ---
 
