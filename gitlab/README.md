@@ -185,6 +185,66 @@ All API calls and operations are wrapped in try-catch blocks with:
 3. Create service function in appropriate `src/services/gitlab/*.js` file
 4. Register tool in `src/tools/gitlab/index.js`
 
+---
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Authentication Failures**
+- Verify your Personal Access Token is correct and not expired
+- Check token has required scopes (see Configuration section)
+- Confirm token hasn't been revoked
+
+**Project Not Found**
+- Verify project ID or URL-encoded path is correct
+- Check that you have access to the project
+- Ensure the project exists in your GitLab instance
+
+**Self-Hosted GitLab Issues**
+- Ensure `GITLAB_BASE_URL` includes `/api/v4`
+- Example: `https://gitlab.example.com/api/v4`
+- Check that your instance is accessible from your network
+
+**IID vs ID Confusion**
+- Use IID (Internal ID) for merge requests and issues, not the global ID
+- IID is the number you see in the UI (e.g., !42, #123)
+- Global ID is a numeric identifier used internally
+
+**Connection Timeouts**
+- Default timeout is 30000ms (30 seconds)
+- Increase via: `GITLAB_TIMEOUT=60000` in `.env`
+- Check network connectivity to GitLab
+
+**Rate Limiting**
+- GitLab has API rate limits (varies by plan)
+- Reduce concurrent requests if hitting limits
+- Check response headers for rate limit info
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! To contribute:
+
+1. Follow the existing architecture patterns
+2. Add endpoints to `src/constants/endpoints.js`
+3. Define schemas in `src/constants/tool-schemas.js`
+4. Implement service functions in `src/services/gitlab/*.js`
+5. Register tools in `src/tools/gitlab/index.js`
+6. Update documentation for new tools
+7. Test thoroughly before submitting
+
+---
+
+## 🔗 Related Documentation
+
+- [Main MCP Servers README](../README.md)
+- [GitLab REST API Documentation](https://docs.gitlab.com/ee/api/)
+- [Personal Access Tokens Guide](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html)
+
+---
+
 ## GitLab API Documentation
 
 This server uses GitLab REST API v4:
