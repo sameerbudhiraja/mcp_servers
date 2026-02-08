@@ -2,6 +2,10 @@
 
 A comprehensive collection of Model Context Protocol (MCP) servers for popular development platforms: **GitHub**, **Bitbucket**, **GitLab**, and **Jira**.
 
+## 🎬 Demo
+
+https://github.com/sameerbudhiraja/mcp_servers/releases/download/v1.0.0/demo.mov
+
 ---
 
 ## 🚀 Overview
