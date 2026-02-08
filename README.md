@@ -4,7 +4,7 @@ A comprehensive collection of Model Context Protocol (MCP) servers for popular d
 
 ## 🎬 Demo
 
-https://github.com/sameerbudhiraja/mcp_servers/releases/download/v1.0.0/demo.mov
+[![Watch the demo](https://img.youtube.com/vi/TYS4y-TeAv8/maxresdefault.jpg)](https://youtu.be/TYS4y-TeAv8)
 
 ---
 
